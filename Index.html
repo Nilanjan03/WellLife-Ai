@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WellLife AI — Wellness & Exercise Manual</title>
+    <!-- Workout API Configuration -->
+    <meta name="workoutx-api-key" content="wx_78fbd0580bddd8e01e5ef360e6173b4ec564861bf41ebc658ef13d04">
+    <script>
+        window.WORKOUTX_API_KEY = "wx_78fbd0580bddd8e01e5ef360e6173b4ec564861bf41ebc658ef13d04";
+    </script>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+    <div class="app">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                WellLife <span>AI</span>
+            </div>
+            <p class="brand-sub">YOUR WELLNESS STUDIO</p>
+            <nav id="nav"></nav>
+            <div class="sidefoot">
+                🌿 Small steps, healthier days.
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main">
+            <header class="topbar">
+                <div>
+                    <span class="eyebrow">PERSONAL WELLNESS STUDIO</span>
+                    <h1 id="pageTitle">Your wellness, simplified.</h1>
+                </div>
+                <div class="topbar-right">
+                    <span id="today"></span>
+                    <button id="settingsBtn" class="pill secondary" title="API Settings">⚙️ API Settings</button>
+                    <button id="profileBtn" class="pill"> Profile</button>
+                </div>
+            </header>
+
+            <section id="content"></section>
+        </main>
+    </div>
+
+    <!-- Floating AI Assistant Toggle Button -->
+    <button id="chatToggle" class="chat-toggle" aria-label="Open AI assistant">
+        <span class="sparkle"></span>
+        <span>Ask Mistral AI</span>
+    </button>
+
+    <!-- Floating Mistral AI Assistant Panel -->
+    <section id="chatPanel" class="chat-panel hidden">
+        <div class="chat-header">
+            <div class="chat-header-info">
+                <h3> WellLife Assistant</h3>
+                <span class="badge-mistral">Powered by Mistral AI</span>
+            </div>
+            <div class="chat-header-actions">
+                <button id="clearChatBtn" title="Clear chat history">🗑️</button>
+                <button id="chatSettingsBtn" title="API Configuration">⚙️</button>
+                <button id="closeChat" title="Close chat">✕</button>
+            </div>
+        </div>
+
+        <!-- Quick AI Suggestions -->
+        <div class="chat-suggestions">
+            <button class="chat-chip" data-prompt="Based on my current menstrual cycle day and phase, what workout intensity and nutrition should I focus on today?">🌸 Cycle Advice</button>
+            <button class="chat-chip" data-prompt="Suggest an effective 3-day weekly workout routine."> 3-Day Workout</button>
+            <button class="chat-chip" data-prompt="Review my logged habits and water intake today, and give me advice."> Habit Review</button>
+            <button class="chat-chip" data-prompt="What are practical habits to get deeper, more restorative sleep?"> Sleep Deeply</button>
+            <button class="chat-chip" data-prompt="Give me a simple high-protein post-workout meal idea."> Meal Idea</button>
+        </div>
+
+        <div id="messages" class="chat-messages">
+            <div class="bubble bot">
+                 Hello! I'm your <b>WellLife AI assistant</b> powered by <b>Mistral AI</b>.<br><br>
+                I can explain exercise mechanics & form from the <b>Workout Manual</b>, suggest workout routines, analyze your daily habits, and guide your hydration and sleep.<br><br>
+                <i>How can I support your health and training today?</i>
+            </div>
+        </div>
+
+        <div class="ai-consent-box">
+            <input type="checkbox" id="aiConsent" checked>
+            <label for="aiConsent" style="margin:0;font-weight:normal;cursor:pointer">
+                Share tracker logs with Mistral AI for personalized tips
+            </label>
+        </div>
+
+        <form id="chatForm" class="chat-form">
+            <input id="chatInput" placeholder="Ask Mistral AI about exercises, nutrition, recovery..." required autocomplete="off">
+            <button type="submit" aria-label="Send message">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+            </button>
+        </form>
+    </section>
+
+    <!-- Exercise Manual Modal Dialog -->
+    <dialog id="exerciseManualDialog">
+        <div class="modal-header">
+            <h2 id="manualTitle">Exercise Manual</h2>
+            <button class="icon-btn" id="closeManualBtn" aria-label="Close manual">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="manual-media" id="manualMediaContainer">
+                <img id="manualGif" src="" alt="Exercise demonstration" loading="lazy">
+                <video id="manualVideo" autoplay loop muted playsinline controls style="display:none;width:100%;max-height:320px;border-radius:12px;"></video>
+            </div>
+            <div class="manual-badges" id="manualBadges"></div>
+            
+            <h4 style="margin: 16px 0 10px 0; font-size: 15px;">Step-by-Step Instructions:</h4>
+            <div id="manualInstructions"></div>
+
+            <div class="manual-tip">
+                <b> Trainer Form Cue:</b> <span id="manualFormCue">Keep core braced, maintain steady rhythmic breathing, and never compromise technique for heavier weights.</span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button id="logThisExerciseBtn">Add to Workout Logger</button>
+            <button class="secondary" id="closeManualFooterBtn">Close</button>
+        </div>
+    </dialog>
+
+    <!-- Profile Dialog -->
+    <dialog id="profileDialog">
+        <form method="dialog" id="profileForm" style="padding: 24px;">
+            <h2 style="margin-top:0;">Personalize your space</h2>
+            <label>
+                Your name
+                <input id="nameInput" placeholder="Your name">
+            </label>
+            <label>
+                Profile / Gender
+                <select id="genderInput">
+                    <option value="custom">Custom</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:16px 0;">
+                <input type="checkbox" id="cycleEnabled" style="width:auto;margin:0;">
+                Enable cycle tracker
+            </label>
+            <div class="row" style="justify-content: flex-end; margin-top: 20px;">
+                <button value="cancel" class="secondary">Cancel</button>
+                <button id="saveProfile" value="save">Save profile</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- API Settings Dialog -->
+    <dialog id="settingsDialog">
+        <div class="modal-header">
+            <h2>API Configuration</h2>
+            <button class="icon-btn" id="closeSettingsBtn" aria-label="Close settings">✕</button>
+        </div>
+        <div class="modal-body">
+            <p class="muted">
+                Configure your API keys for <b>Mistral AI</b> (assistant) and <b>WorkoutX</b> (workout library). You can also set these inside a <code>.env</code> file on the server.
+            </p>
+
+            <label>
+                Mistral AI API Key
+                <input id="mistralKeyInput" type="password" placeholder="Enter Mistral API Key (e.g. from console.mistral.ai)">
+            </label>
+            <p class="muted" style="font-size:12px;margin-top:2px;">
+                Get a free key at <a href="https://console.mistral.ai/" target="_blank" rel="noopener">console.mistral.ai</a>
+            </p>
+
+            <label style="margin-top:16px;">
+                 WorkoutX API Key (Active — 2,760+ Exercises with HD Video Demonstrations)
+                <input id="workoutxKeyInput" type="password" value="wx_78fbd0580bddd8e01e5ef360e6173b4ec564861bf41ebc658ef13d04" placeholder="Enter WorkoutX API Key">
+            </label>
+            <p class="muted" style="font-size:12px;margin-top:2px;">
+                WorkoutX API powers the live workout section with 2,764 exercises, HD looping videos, and trainer form cues.
+            </p>
+
+            <div id="apiStatusMessage" style="margin-top:14px;font-size:13px;"></div>
+        </div>
+        <div class="modal-footer">
+            <button id="saveApiSettingsBtn">Save & Apply</button>
+            <button class="secondary" id="closeSettingsFooterBtn">Close</button>
+        </div>
+    </dialog>
+</body>
+
+</html>

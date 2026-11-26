@@ -1,1521 +1,497 @@
-const KEY = 'welllife-v1';
-const date = () => new Date().toLocaleDateString('en-CA');
+/**
+ * WellLife AI - Curated Exercise Data & Transformers
+ * Compatible with Node.js backend & Browser frontend (GitHub Pages / static host)
+ */
 
-const initial = {
-    profile: { name: 'Friend', gender: 'custom', cycle: true },
-    water: {},
-    sleep: [],
-    workouts: [],
-    meals: [],
-    moods: {},
-    habits: [
-        { id: 1, name: 'Morning walk or stretch', days: [] },
-        { id: 2, name: 'Drink 8 glasses of water', days: [] },
-        { id: 3, name: 'Eat mindful fresh fruit or greens', days: [] }
-    ],
-    cycles: [],
-    goals: { water: 8, sleep: 8, exercise: 30 }
-};
-
-let db;
-try {
-    db = { ...structuredClone(initial), ...JSON.parse(localStorage.getItem(KEY) || '{}') };
-    // Ensure nested objects exist
-    if (!db.habits || !Array.isArray(db.habits)) db.habits = structuredClone(initial.habits);
-    if (!db.goals) db.goals = structuredClone(initial.goals);
-    if (!db.profile) db.profile = structuredClone(initial.profile);
-    if (db.profile.cycle === undefined) db.profile.cycle = true;
-    if (!db.cycles) db.cycles = [];
-} catch {
-    db = structuredClone(initial);
-}
-
-const save = () => localStorage.setItem(KEY, JSON.stringify(db));
-const $ = s => document.querySelector(s);
-const $$ = s => document.querySelectorAll(s);
-
-const esc = s => String(s || '').replace(/[&<>"']/g, c => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;'
-}[c]));
-
-const today = date();
-let page = 'Dashboard';
-let chartInstances = {};
-let currentExercises = [];
-let selectedExerciseForManual = null;
-let exerciseSearchTimeout = null;
-
-const menu = [
-    'Dashboard',
-    'Exercise',
-    'Water',
-    'Sleep',
-    'Nutrition',
-    'Mood',
-    'Habits',
-    'Cycle Tracker',
-    'Analytics'
+const BUILTIN_EXERCISES = [
+    {
+        id: "0025",
+        name: "barbell bench press",
+        bodyPart: "chest",
+        target: "pectorals",
+        equipment: "barbell",
+        secondaryMuscles: ["shoulders", "triceps"],
+        instructions: [
+            "Lie flat on the bench with your eyes under the barbell and feet firmly planted on the floor.",
+            "Grip the barbell slightly wider than shoulder-width with wrists straight.",
+            "Unrack the bar and stabilize it directly over your chest with locked elbows.",
+            "Inhale and lower the barbell under strict control to touch your mid-chest, keeping elbows at a ~45-degree angle.",
+            "Exhale and drive the bar back up to the starting position without bouncing off your ribs."
+        ],
+        gifUrl: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "0314",
+        name: "incline dumbbell press",
+        bodyPart: "chest",
+        target: "pectorals",
+        equipment: "dumbbell",
+        secondaryMuscles: ["front delts", "triceps"],
+        instructions: [
+            "Set an adjustable bench to an incline of 30 to 45 degrees.",
+            "Sit with a dumbbell resting on each knee, then kick them back to shoulder height as you lie back.",
+            "Press the dumbbells overhead until your arms are fully extended but not locked.",
+            "Lower the weights slowly until the dumbbells are level with your upper chest.",
+            "Push the dumbbells back up while squeezing the upper chest at the peak."
+        ],
+        gifUrl: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "0662",
+        name: "push-up",
+        bodyPart: "chest",
+        target: "pectorals",
+        equipment: "body weight",
+        secondaryMuscles: ["shoulders", "triceps", "core"],
+        instructions: [
+            "Place your hands on the ground slightly wider than shoulder-width apart.",
+            "Extend legs straight back, creating a rigid straight line from head to heels.",
+            "Lower your body by bending elbows until your chest is an inch off the floor.",
+            "Push vigorously into the ground to return to starting plank position.",
+            "Maintain core tension and prevent hips from sagging throughout."
+        ],
+        gifUrl: "https://images.unsplash.com/photo-1598971639058-fab3c3109a00?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "0172",
+        name: "cable crossover fly",
+        bodyPart: "chest",
+        target: "pectorals",
+        equipment: "cable",
+        secondaryMuscles: ["front delts"],
+        instructions: [
+            "Set cable pulleys at chest height and hold a stirrup handle in each hand.",
+            "Take a step forward into a staggered stance to create tension on the cables.",
+            "With a slight bend in your elbows, bring both hands forward and together in a wide hugging motion.",
+            "Squeeze the chest muscles hard at the center point.",
+            "Slowly reverse the movement back to a deep chest stretch."
+        ],
+        gifUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "0652",
+        name: "pull-up",
+        bodyPart: "back",
+        target: "lats",
+        equipment: "body weight",
+        secondaryMuscles: ["biceps", "upper back", "forearms"],
+        instructions: [
+            "Grasp a pull-up bar with an overhand grip slightly wider than shoulder-width.",
+            "Hang with straight arms and engage your core to prevent swinging.",
+            "Pull your shoulder blades down and back, then drive your elbows toward the floor to pull your chest up.",
+            "Continue until your chin clears the bar comfortably.",
+            "Lower down smoothly to a full dead hang before beginning the next repetition."
+        ],
+        gifUrl: "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "0498",
+        name: "lat pulldown",
+        bodyPart: "back",
+        target: "lats",
+        equipment: "cable",
+        secondaryMuscles: ["biceps", "rhomboids"],
+        instructions: [
+            "Adjust the thigh pads so your legs fit securely under them.",
+            "Grip the wide bar with an overhand grip and sit down with upright posture.",
+            "Lean back slightly (about 10 degrees) and pull the bar smoothly down to your upper chest.",
+            "Focus on driving your elbows down and back while engaging your lat muscles.",
+            "Slowly guide the bar back up until your arms and lats are fully stretched."
+        ],
+        gifUrl: "https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "0027",
+        name: "barbell bent over row",
+        bodyPart: "back",
+        target: "upper back",
+        equipment: "barbell",
+        secondaryMuscles: ["lats", "biceps", "lower back"],
+        instructions: [
+            "Stand with feet hip-width apart and hold a barbell with a shoulder-width overhand grip.",
+            "Hinge at the hips, bending your knees slightly, keeping your back completely flat and chest proud.",
+            "Let the bar hang in front of your shins.",
+            "Pull the bar up toward your belly button, tucking your elbows close to your torso.",
+            "Squeeze your shoulder blades together at the top, then lower with control."
+        ],
+        gifUrl: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "0758",
+        name: "seated cable row",
+        bodyPart: "back",
+        target: "lats",
+        equipment: "cable",
+        secondaryMuscles: ["biceps", "rhomboids", "rear delts"],
+        instructions: [
+            "Sit on the low row bench, place feet on footrests with knees slightly bent.",
+            "Reach forward to grab the V-bar handle and slide back to a tall, neutral spine posture.",
+            "Pull the handle straight toward your lower abdomen without rocking your torso back and forth.",
+            "Pinch your shoulder blades firmly together for a second at the contraction.",
+            "Return the weight smoothly under control to full arm extension."
+        ],
+        gifUrl: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "0032",
+        name: "barbell deadlift",
+        bodyPart: "back",
+        target: "glutes",
+        equipment: "barbell",
+        secondaryMuscles: ["hamstrings", "lats", "traps", "core"],
+        instructions: [
+            "Stand with feet hip-width apart with the barbell over your mid-foot.",
+            "Hinge at the hips and grip the bar just outside your knees.",
+            "Bring shins to touch the bar, drop hips slightly, pull chest up, and brace your core.",
+            "Drive through the floor with your feet, extending hips and knees simultaneously.",
+            "Lock out upright at the top without hyperextending your spine, then reverse the movement down."
+        ],
+        gifUrl: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "0047",
+        name: "barbell overhead press",
+        bodyPart: "shoulders",
+        target: "delts",
+        equipment: "barbell",
+        secondaryMuscles: ["triceps", "upper chest", "core"],
+        instructions: [
+            "Rest the barbell across your clavicles and front shoulders with a shoulder-width grip.",
+            "Brace your glutes, abs, and quadriceps tightly.",
+            "Press the bar vertically upwards in a straight line, tilting your chin back slightly as it passes.",
+            "Lock your elbows at the top with the barbell balanced directly over your mid-foot and spine.",
+            "Lower the bar back to your upper chest with control."
+        ],
+        gifUrl: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "0334",
+        name: "dumbbell lateral raise",
+        bodyPart: "shoulders",
+        target: "delts",
+        equipment: "dumbbell",
+        secondaryMuscles: ["traps"],
+        instructions: [
+            "Stand with a dumbbell in each hand at your sides, palms facing inward.",
+            "Keep a slight forward hinge in your hips and a tiny bend in your elbows.",
+            "Raise dumbbells outward to the sides until your arms are parallel to the floor.",
+            "Lead with your elbows and ensure wrists do not go higher than your elbows.",
+            "Pause briefly, then lower slowly back down under complete tension."
+        ],
+        gifUrl: "https://images.unsplash.com/photo-1583454155184-870a1f63aebc?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "0185",
+        name: "face pull",
+        bodyPart: "shoulders",
+        target: "delts",
+        equipment: "cable",
+        secondaryMuscles: ["rotator cuff", "rhomboids", "upper traps"],
+        instructions: [
+            "Attach a rope to a cable pulley at upper-chest or head height.",
+            "Grip the rope handles with thumbs facing backward and step back to create tension.",
+            "Pull the rope toward your face, flaring elbows out wide.",
+            "As the hands approach your eyes, rotate wrists back into an external rotation posture.",
+            "Hold the peak contraction for a count, then return with control."
+        ],
+        gifUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "0294",
+        name: "dumbbell biceps curl",
+        bodyPart: "upper arms",
+        target: "biceps",
+        equipment: "dumbbell",
+        secondaryMuscles: ["brachialis", "forearms"],
+        instructions: [
+            "Stand tall holding a dumbbell in each hand with arms extended and palms facing forward.",
+            "Keep elbows tucked tightly to your sides.",
+            "Curl the weights up by contracting your biceps while keeping upper arms completely stationary.",
+            "Squeeze your biceps intensely at the top near shoulder height.",
+            "Lower the weights slowly over 2-3 seconds back to full extension."
+        ],
+        gifUrl: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "0313",
+        name: "dumbbell hammer curl",
+        bodyPart: "upper arms",
+        target: "biceps",
+        equipment: "dumbbell",
+        secondaryMuscles: ["brachioradialis", "forearms"],
+        instructions: [
+            "Hold dumbbells with a neutral grip (palms facing each other) at your sides.",
+            "Without swinging your hips, curl the dumbbells upward along your torso.",
+            "Maintain the neutral palm-facing position through the entire range.",
+            "Pause at maximum contraction near your chest.",
+            "Lower with steady control to the starting stretch."
+        ],
+        gifUrl: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "0241",
+        name: "triceps rope pushdown",
+        bodyPart: "upper arms",
+        target: "triceps",
+        equipment: "cable",
+        secondaryMuscles: ["forearms"],
+        instructions: [
+            "Attach a rope to a high cable pulley and hold the ends with a neutral grip.",
+            "Pin your upper arms firmly to the sides of your ribcage with elbows bent at 90 degrees.",
+            "Extend your arms down, pushing the rope ends apart at the bottom to lock out the triceps.",
+            "Feel the contraction in the lateral and long heads of the triceps.",
+            "Slowly bend elbows to return to horizontal without letting elbows drift forward."
+        ],
+        gifUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "0043",
+        name: "barbell back squat",
+        bodyPart: "upper legs",
+        target: "quads",
+        equipment: "barbell",
+        secondaryMuscles: ["glutes", "hamstrings", "core"],
+        instructions: [
+            "Rest the barbell across your upper traps and stand with feet slightly wider than shoulder-width, toes turned out 15 degrees.",
+            "Take a deep diaphragmatic breath and brace your core.",
+            "Sit back and bend knees, pushing knees out in line with your toes.",
+            "Descend until thighs are at least parallel to the floor.",
+            "Drive powerfully through your whole foot to stand back up, exhaling near the top."
+        ],
+        gifUrl: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "0528",
+        name: "leg press",
+        bodyPart: "upper legs",
+        target: "quads",
+        equipment: "leverage machine",
+        secondaryMuscles: ["glutes", "hamstrings"],
+        instructions: [
+            "Sit in the leg press machine and place feet hip-width on the sled platform.",
+            "Release safety bars and lower the sled under control until knees reach a 90-degree angle.",
+            "Do not allow your lower back or tailbone to lift off the padded backrest.",
+            "Press the platform back up through your heels and mid-foot.",
+            "Stop just short of locking your knees violently to keep tension on the quads."
+        ],
+        gifUrl: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "0088",
+        name: "barbell romanian deadlift",
+        bodyPart: "upper legs",
+        target: "hamstrings",
+        equipment: "barbell",
+        secondaryMuscles: ["glutes", "lower back"],
+        instructions: [
+            "Hold the barbell at hip level with an overhand grip and knees soft (slightly unlocked).",
+            "Send your hips back toward the wall behind you while keeping your spine straight and bar skimming your legs.",
+            "Feel a deep stretch throughout your hamstrings as the bar passes just below knee height.",
+            "Do not round your shoulders or lower back.",
+            "Drive your hips forward and squeeze glutes hard to return to standing."
+        ],
+        gifUrl: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "0300",
+        name: "dumbbell bulgarian split squat",
+        bodyPart: "upper legs",
+        target: "quads",
+        equipment: "dumbbell",
+        secondaryMuscles: ["glutes", "hamstrings", "calves"],
+        instructions: [
+            "Stand a few feet in front of a flat bench and rest the top of one foot behind you on the bench.",
+            "Hold dumbbells at your sides and brace your core.",
+            "Lower your body by bending the front knee until the back knee hovers just above the floor.",
+            "Keep front knee tracking over your second toe and torso slightly tilted forward.",
+            "Push through your front heel to return to the starting position."
+        ],
+        gifUrl: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "0042",
+        name: "barbell hip thrust",
+        bodyPart: "upper legs",
+        target: "glutes",
+        equipment: "barbell",
+        secondaryMuscles: ["hamstrings", "core"],
+        instructions: [
+            "Sit on the floor with your upper back supported against a sturdy bench and a padded barbell over your hips.",
+            "Plant your feet firmly on the ground about shoulder-width apart.",
+            "Drive through your heels to lift your hips until thighs and torso are in a straight horizontal line.",
+            "Squeeze glutes at top lockout with chin tucked slightly toward your chest.",
+            "Lower hips back down under control to complete each repetition."
+        ],
+        gifUrl: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "0685",
+        name: "plank",
+        bodyPart: "waist",
+        target: "abs",
+        equipment: "body weight",
+        secondaryMuscles: ["obliques", "shoulders", "glutes"],
+        instructions: [
+            "Rest on forearms with elbows placed directly underneath your shoulders.",
+            "Extend legs back with toes grounded, holding body in a rigid horizontal line.",
+            "Pull your belly button in toward your spine and squeeze your glutes tightly.",
+            "Keep neck neutral by looking at the floor slightly ahead of your hands.",
+            "Breathe steadily without letting hips hike upward or sag down."
+        ],
+        gifUrl: "https://images.unsplash.com/photo-1566241142559-40e1dab266c6?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "0473",
+        name: "hanging leg raise",
+        bodyPart: "waist",
+        target: "abs",
+        equipment: "body weight",
+        secondaryMuscles: ["hip flexors", "forearms"],
+        instructions: [
+            "Hang from a pull-up bar with an overhand grip and legs straight.",
+            "Brace your core and roll your pelvis upward as you raise your legs toward horizontal.",
+            "Focus on flexing the lower abdominal wall rather than swinging with momentum.",
+            "Hold for a brief second at 90 degrees.",
+            "Lower your legs slowly back down, stopping before any swing occurs."
+        ],
+        gifUrl: "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "0687",
+        name: "russian twist",
+        bodyPart: "waist",
+        target: "abs",
+        equipment: "body weight",
+        secondaryMuscles: ["obliques", "hip flexors"],
+        instructions: [
+            "Sit on a mat with knees bent and feet elevated slightly off the floor.",
+            "Lean torso back about 45 degrees, engaging your deep core to balance on your sit bones.",
+            "Clasp hands in front of your chest and rotate torso smoothly to touch the floor on your right side.",
+            "Rotate back across your body to touch the floor on your left side.",
+            "Move with controlled rotation from your ribcage, not just your arms."
+        ],
+        gifUrl: "https://images.unsplash.com/photo-1598971639058-fab3c3109a00?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "0683",
+        name: "treadmill interval run",
+        bodyPart: "cardio",
+        target: "cardiovascular system",
+        equipment: "treadmill",
+        secondaryMuscles: ["quads", "calves", "hamstrings"],
+        instructions: [
+            "Attach safety clip to clothing and start with a 3-minute warm-up walk at 4 km/h.",
+            "Increase speed to a brisk run for 60 seconds (8-12 km/h).",
+            "Slow down to a recovery walk for 90 seconds (4-5 km/h).",
+            "Repeat the intervals 5 to 8 times.",
+            "Finish with a 3-minute cool-down walk and light stretching."
+        ],
+        gifUrl: "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "0534",
+        name: "jump rope",
+        bodyPart: "cardio",
+        target: "cardiovascular system",
+        equipment: "rope",
+        secondaryMuscles: ["calves", "shoulders", "forearms"],
+        instructions: [
+            "Hold handles at hip height with elbows bent near your sides.",
+            "Turn the rope using small, fluid circular motions of your wrists.",
+            "Jump on the balls of your feet just 1 to 2 inches off the ground to let the rope pass.",
+            "Keep knees slightly soft upon landing to absorb impact smoothly.",
+            "Maintain an upright posture and rhythmic breathing."
+        ],
+        gifUrl: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "0522",
+        name: "kettlebell swing",
+        bodyPart: "cardio",
+        target: "glutes",
+        equipment: "kettlebell",
+        secondaryMuscles: ["hamstrings", "core", "shoulders"],
+        instructions: [
+            "Stand with feet shoulder-width apart, kettlebell placed on the floor a foot in front of you.",
+            "Hinge at the hips, grip the handle, and hike the kettlebell back between your thighs.",
+            "Drive hips forward explosively and stand tall, projecting the kettlebell to chest height.",
+            "Do not lift with your arms; let the hip power float the bell upward.",
+            "Let the weight swing back naturally into the hinge for the next rep."
+        ],
+        gifUrl: "https://images.unsplash.com/photo-1583454155184-870a1f63aebc?w=600&auto=format&fit=crop&q=80"
+    }
 ];
 
-// Helper card & meter builders
-const box = (title, body, cls = '') => `<article class="card ${cls}"><h3>${title}</h3>${body}</article>`;
-const meter = (n, d) => `<div class="bar"><i style="width:${Math.min(100, Math.max(0, (n / d) * 100 || 0))}%"></i></div>`;
-const button = (label, action, extra = '') => `<button ${extra} data-action="${action}">${label}</button>`;
-
-// Helper to retrieve WorkoutX API key from storage, HTML meta, or window config
-const getWorkoutXApiKey = () => {
-    return localStorage.getItem('welllife_workoutx_key') ||
-        (typeof window !== 'undefined' && window.WORKOUTX_API_KEY) ||
-        document.querySelector('meta[name="workoutx-api-key"]')?.content ||
-        'wx_78fbd0580bddd8e01e5ef360e6173b4ec564861bf41ebc658ef13d04';
-};
-if (typeof localStorage !== 'undefined' && !localStorage.getItem('welllife_workoutx_key')) {
-    localStorage.setItem('welllife_workoutx_key', 'wx_78fbd0580bddd8e01e5ef360e6173b4ec564861bf41ebc658ef13d04');
-}
-
-// Calculate menstrual cycle count, phases, and historical statistics
-function getCycleStats() {
-    const cycles = Array.isArray(db.cycles) ? db.cycles : [];
-    if (cycles.length === 0) {
-        return {
-            hasData: false,
-            cycleDay: 0,
-            totalDays: 28,
-            daysUntilNext: 28,
-            isLate: false,
-            daysLate: 0,
-            nextPeriodDate: null,
-            phase: 'Not Tracked Yet',
-            phaseKey: 'none',
-            phaseColor: '#7c3aed',
-            phaseIcon: '🌸',
-            phaseDescription: 'Log your period start date below to calculate your cycle day count and active hormonal phase.',
-            phaseWorkoutTip: 'Track your cycle to receive workout recommendations tailored to your energy levels.',
-            phaseNutritionTip: 'Focus on balanced hydration, adequate protein, and micronutrient-rich whole foods.',
-            progressPercent: 0,
-            totalCycles: 0,
-            avgLength: 28,
-            avgDuration: 5,
-            latestCycle: null,
-            sortedCycles: []
-        };
-    }
-
-    // Sort ascending by start date
-    const sorted = [...cycles].sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
-    const latest = sorted[sorted.length - 1];
-
-    const startDate = new Date(latest.start + 'T00:00:00');
-    const todayDate = new Date(today + 'T00:00:00');
-    const diffMs = todayDate.getTime() - startDate.getTime();
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24)); // 0 on start date
-
-    const cycleLength = Math.max(15, Math.min(60, Number(latest.length) || 28));
-    const periodDuration = Math.max(1, Math.min(15, Number(latest.duration) || 5));
-
-    let cycleDay;
-    if (diffDays < 0) {
-        cycleDay = 1;
-    } else {
-        cycleDay = diffDays + 1; // 1-indexed, Day 1 is period start day
-    }
-
-    const nextDate = new Date(startDate.getTime() + cycleLength * 86400000);
-    const daysUntilNext = Math.ceil((nextDate.getTime() - todayDate.getTime()) / (1000 * 60 * 60 * 24));
-    const isLate = daysUntilNext < 0;
-    const daysLate = isLate ? Math.abs(daysUntilNext) : 0;
-
-    // Phase determination (based on standard physiological cycles)
-    const ovulationDay = Math.max(periodDuration + 2, cycleLength - 14);
-
-    let phase = 'Follicular Phase';
-    let phaseKey = 'follicular';
-    let phaseColor = '#3b82f6';
-    let phaseIcon = '🌱';
-    let phaseDescription = 'Estrogen is steadily rising as ovarian follicles develop. Your physical energy, endurance, and insulin sensitivity are building up.';
-    let phaseWorkoutTip = 'Prime time for progressive overload: increase training volume, focus on compound barbell & dumbbell lifts, and push your strength capacity.';
-    let phaseNutritionTip = 'Your body utilizes carbohydrates efficiently now. Prioritize complex grains (oats, quinoa), lean proteins, and colorful vegetables.';
-
-    if (cycleDay <= periodDuration) {
-        phase = 'Menstrual Phase';
-        phaseKey = 'menstrual';
-        phaseColor = '#f43f5e';
-        phaseIcon = '🩸';
-        phaseDescription = 'Hormone levels (estrogen & progesterone) are at their lowest baseline while the uterine lining sheds. Recovery capacity may be reduced.';
-        phaseWorkoutTip = 'Opt for restorative movement: gentle walking, light stretching, mobility drills, and mat yoga. Avoid pushing through acute fatigue or cramps.';
-        phaseNutritionTip = 'Replenish iron losses with lentils, dark leafy greens, beans, and vitamin C. Drink warm herbal teas and maintain abundant hydration.';
-    } else if (cycleDay < ovulationDay) {
-        phase = 'Follicular Phase';
-        phaseKey = 'follicular';
-        phaseColor = '#3b82f6';
-        phaseIcon = '🌱';
-        phaseDescription = 'Estrogen is rising steadily. You will typically experience higher mental alertness, motivation, and muscular stamina.';
-        phaseWorkoutTip = 'Great training window: aim for heavier weights, test personal bests, and incorporate challenging resistance workouts.';
-        phaseNutritionTip = 'Support muscle repair with high-quality lean protein, fermented foods for gut health, and clean complex carbohydrates.';
-    } else if (cycleDay <= ovulationDay + 2) {
-        phase = 'Ovulatory Phase';
-        phaseKey = 'ovulatory';
-        phaseColor = '#10b981';
-        phaseIcon = '🌟';
-        phaseDescription = 'Luteinizing hormone surges and an egg is released. Testosterone and estrogen peak, conferring high power output and confidence.';
-        phaseWorkoutTip = 'Peak power output window! High-intensity interval training (HIIT), fast-paced circuits, sprints, and maximum effort sets shine here.';
-        phaseNutritionTip = 'Incorporate cruciferous vegetables (broccoli, cauliflower) and plenty of dietary fiber to assist natural estrogen processing.';
-    } else if (cycleDay <= cycleLength) {
-        phase = 'Luteal Phase';
-        phaseKey = 'luteal';
-        phaseColor = '#f59e0b';
-        phaseIcon = '🍂';
-        phaseDescription = 'Progesterone dominates to prepare the body. Core body temperature is slightly higher and resting metabolic rate increases by 100-300 kcal.';
-        phaseWorkoutTip = 'Gradually dial back intensity toward moderate resistance training, Pilates, and steady-state cardio. Allow extra recovery between sets.';
-        phaseNutritionTip = 'Cravings may rise due to higher energy burn. Satisfy hunger with magnesium-rich foods (pumpkin seeds, dark chocolate), healthy fats, and fiber.';
-    } else {
-        phase = 'Extended Cycle';
-        phaseKey = 'extended';
-        phaseColor = '#8b5cf6';
-        phaseIcon = '⏳';
-        phaseDescription = `You are on Day ${cycleDay}, which is ${daysLate} day(s) past your typical ${cycleLength}-day cycle length.`;
-        phaseWorkoutTip = 'Prioritize gentle walking, stress management, breathwork, and deep sleep. Natural variations or stress frequently shift cycle timing.';
-        phaseNutritionTip = 'Keep cortisol in check with warm herbal teas, magnesium, and balanced, nourishing meals without skipping nutrition.';
-    }
-
-    const progressPercent = Math.min(100, Math.max(0, Math.round((Math.min(cycleDay, cycleLength) / cycleLength) * 100)));
-
-    const avgLength = (sorted.reduce((acc, c) => acc + (Number(c.length) || 28), 0) / sorted.length).toFixed(1);
-    const avgDuration = (sorted.reduce((acc, c) => acc + (Number(c.duration) || 5), 0) / sorted.length).toFixed(1);
+// Helper to transform WorkoutX API exercises into WellLife format
+function transformWorkoutXExercise(ex) {
+    const secondary = (ex.secondaryMuscles || []).map(m => typeof m === 'object' ? (m.group || m.anatomical?.[0] || '') : m).filter(Boolean);
+    const primary = (ex.primaryMuscles || []).map(m => typeof m === 'object' ? (m.group || m.anatomical?.[0] || '') : m).filter(Boolean);
 
     return {
-        hasData: true,
-        cycleDay,
-        totalDays: cycleLength,
-        daysUntilNext,
-        isLate,
-        daysLate,
-        nextPeriodDate: nextDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }),
-        phase,
-        phaseKey,
-        phaseColor,
-        phaseIcon,
-        phaseDescription,
-        phaseWorkoutTip,
-        phaseNutritionTip,
-        progressPercent,
-        periodDuration,
-        ovulationDay,
-        totalCycles: sorted.length,
-        avgLength: parseFloat(avgLength),
-        avgDuration: parseFloat(avgDuration),
-        latestCycle: latest,
-        sortedCycles: sorted
+        id: ex.id,
+        name: ex.name,
+        bodyPart: (ex.bodyPart || '').toLowerCase(),
+        target: (ex.target || primary[0] || '').toLowerCase(),
+        equipment: (ex.equipment || 'body weight').toLowerCase(),
+        secondaryMuscles: secondary,
+        primaryMuscles: primary,
+        category: ex.category || 'strength',
+        difficulty: ex.difficulty || 'intermediate',
+        recommendedSets: ex.recommendedSets || '3',
+        recommendedReps: ex.recommendedReps || '10-15',
+        caloriesPerMinute: ex.caloriesPerMinute || null,
+        instructions: Array.isArray(ex.instructions) ? ex.instructions : [ex.instructions].filter(Boolean),
+        tips: Array.isArray(ex.tips) ? ex.tips : [ex.tips].filter(Boolean),
+        gifUrl: ex.media?.poster || 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=500&auto=format&fit=crop&q=80',
+        poster: ex.media?.poster || null,
+        videoUrl: ex.media?.mp4 || null,
+        loopSeconds: ex.loopSeconds || null,
+        description: ex.description || '',
+        source: 'workoutx'
     };
 }
 
-// Nav Bar
-function nav() {
-    $('#nav').innerHTML = menu
-        .filter(x => x !== 'Cycle Tracker' || db.profile.cycle !== false)
-        .map(x => {
-            const icons = {
-                Dashboard: '◫',
-                Exercise: '🏋️',
-                Water: '💧',
-                Sleep: '☾',
-                Nutrition: '🍎',
-                Mood: '☺',
-                Habits: '✓',
-                'Cycle Tracker': '🌸',
-                Analytics: '▥'
-            };
-            return `<button class="${page === x ? 'active' : ''}" data-page="${x}">
-                <span>${icons[x] || '•'}</span> &nbsp;${x}
-            </button>`;
-        }).join('');
-}
+// Filter fallback builtin exercises
+function filterBuiltinExercises({ search, bodyPart, equipment, limit = 24, offset = 0 } = {}) {
+    let results = BUILTIN_EXERCISES;
 
-// Computations
-const water = () => db.water[today] || 0;
-const sleepToday = () => db.sleep.filter(x => x.date === today).at(-1)?.hours || 0;
-const minutesToday = () => db.workouts.filter(x => x.date === today).reduce((a, x) => a + Number(x.minutes || 0), 0);
-const completed = () => db.habits.filter(x => x.days.includes(today)).length;
-const score = () => {
-    const wScore = Math.min(1, water() / (db.goals.water || 8));
-    const sScore = Math.min(1, sleepToday() / (db.goals.sleep || 8));
-    const eScore = Math.min(1, minutesToday() / (db.goals.exercise || 30));
-    const hScore = db.habits.length ? completed() / db.habits.length : 0;
-    return Math.round((wScore + sScore + eScore + hScore) * 25);
-};
-
-// ----------------- Page Renderers -----------------
-
-// 1. Dashboard
-function dashboard() {
-    const cycleStats = getCycleStats();
-
-    return `
-    <div class="hero">
-        <div>
-            <div class="eyebrow" style="color: #d1fae5">WELCOME BACK, ${esc(db.profile.name.toUpperCase())}</div>
-            <h2>Make today a little healthier 🌿</h2>
-            <p>Every small step builds momentum. Let's make today count.</p>
-        </div>
-        <div class="score-circle">${score()}%</div>
-    </div>
-    
-    <div class="grid">
-        ${[
-            ['💧', 'Water', `${water()} / ${db.goals.water} glasses`, water(), db.goals.water],
-            ['☾', 'Sleep', `${sleepToday()} / ${db.goals.sleep} hours`, sleepToday(), db.goals.sleep],
-            ['🏃', 'Activity', `${minutesToday()} / ${db.goals.exercise} min`, minutesToday(), db.goals.exercise],
-            ['✓', 'Habits', `${completed()} / ${db.habits.length} done`, completed(), db.habits.length || 1]
-        ].map(([i, t, v, n, d]) => `
-            <div class="card metric">
-                <div class="icon">${i}</div>
-                <p class="muted">${t}</p>
-                <h2>${v}</h2>
-                ${meter(n, d)}
-            </div>
-        `).join('')}
-
-        <!-- Menstrual Cycle Count Card on Dashboard -->
-        ${db.profile.cycle !== false ? `
-            <div class="card full" style="border-left: 4px solid ${cycleStats.hasData ? cycleStats.phaseColor : '#7c3aed'};">
-                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
-                    <div>
-                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-                            <span class="tag" style="background:${cycleStats.hasData ? cycleStats.phaseColor + '20' : '#ede9fe'};color:${cycleStats.hasData ? cycleStats.phaseColor : '#6d28d9'};font-weight:700;">
-                                ${cycleStats.phaseIcon} ${cycleStats.phase}
-                            </span>
-                            ${cycleStats.hasData ? `
-                                <span class="muted">
-                                    ${cycleStats.isLate ? `⚠️ ${cycleStats.daysLate} day(s) late` : `⏳ Next period in ${cycleStats.daysUntilNext} days (${cycleStats.nextPeriodDate})`}
-                                </span>
-                            ` : ''}
-                        </div>
-                        <h2 style="margin:4px 0 6px;font-size:22px;font-weight:800;">
-                            ${cycleStats.hasData ? `Day ${cycleStats.cycleDay} of ${cycleStats.totalDays} · Menstrual Cycle Count` : 'Menstrual Cycle Tracker'}
-                        </h2>
-                        <p class="muted" style="margin:0;">
-                            ${cycleStats.hasData ? cycleStats.phaseDescription : 'Track your cycle day count, menstrual rhythm, and phase-tailored workout recommendations.'}
-                        </p>
-                    </div>
-                    <div class="row">
-                        ${button('🌸 View Cycle Tracker', 'goCycle')}
-                        ${cycleStats.hasData ? button('✨ Ask AI Phase Advice', 'cycleAI', 'class="secondary"') : ''}
-                    </div>
-                </div>
-                ${cycleStats.hasData ? `
-                    <div class="bar" style="margin-top:14px;height:10px;">
-                        <i style="width:${cycleStats.progressPercent}%;background:${cycleStats.phaseColor};"></i>
-                    </div>
-                ` : ''}
-            </div>
-        ` : ''}
-
-        ${box('Today’s habits', habitRows(), 'wide')}
-
-        ${box('Quick actions', `
-            <p class="muted">Log your daily progress easily:</p>
-            <div class="row">
-                ${button('💧 + Water', 'addWater')}
-                ${button('🏋️ Browse Exercises', 'goExercise', 'class="secondary"')}
-                ${button('🌸 Track Cycle', 'goCycle', 'class="secondary"')}
-                ${button('☾ Log sleep', 'goSleep', 'class="secondary"')}
-            </div>
-        `, 'wide')}
-
-        ${box('Workout Library & Mistral AI Support', `
-            <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;justify-content:space-between">
-                <div>
-                    <b>⚡ WorkoutX API:</b> Access 2,760+ animated HD video exercises & manuals.<br>
-                    <b>✨ Mistral AI:</b> Ask form tips, habit analysis, and meal ideas in the floating assistant.
-                </div>
-                <div class="row">
-                    ${button('Open AI Assistant', 'openAssistant', 'class="secondary"')}
-                </div>
-            </div>
-        `, 'full')}
-    </div>`;
-}
-
-function habitRows() {
-    return db.habits.map(h => `
-        <div class="item">
-            <label style="margin:0;cursor:pointer;display:flex;align-items:center;gap:8px;">
-                <input type="checkbox" data-habit="${h.id}" ${h.days.includes(today) ? 'checked' : ''} style="width:auto;margin:0;">
-                ${esc(h.name)}
-            </label>
-            <span class="tag ${h.days.includes(today) ? '' : 'accent'}">
-                ${h.days.includes(today) ? '✓ Done' : 'Pending'}
-            </span>
-        </div>
-    `).join('') || '<p class="muted">No habits added yet. Go to Habits page to create one.</p>';
-}
-
-// 2. Exercise & Workout Manual Page
-function exercisePage() {
-    return `
-    <div class="grid">
-        <div class="card full">
-            <h3>
-                <span>🏋️ WorkoutX & Exercise Manual Library</span>
-                <span class="tag" id="exerciseSourceTag">Loading catalog...</span>
-            </h3>
-
-            <div class="exercise-toolbar">
-                <input id="exerciseSearch" placeholder="Search exercises, muscles (e.g. bench press, squat, lats, abs)...">
-                <select id="bodyPartFilter">
-                    <option value="all">All Body Parts</option>
-                    <option value="chest">Chest</option>
-                    <option value="back">Back</option>
-                    <option value="shoulders">Shoulders</option>
-                    <option value="upper arms">Upper Arms (Biceps/Triceps)</option>
-                    <option value="upper legs">Upper Legs (Quads/Hamstrings)</option>
-                    <option value="waist">Waist & Core</option>
-                    <option value="cardio">Cardio</option>
-                    <option value="lower legs">Lower Legs (Calves)</option>
-                    <option value="lower arms">Lower Arms (Forearms)</option>
-                </select>
-                <select id="equipmentFilter">
-                    <option value="all">All Equipment</option>
-                    <option value="barbell">Barbell</option>
-                    <option value="dumbbell">Dumbbell</option>
-                    <option value="cable">Cable</option>
-                    <option value="body weight">Body Weight</option>
-                    <option value="leverage machine">Machine</option>
-                    <option value="kettlebell">Kettlebell</option>
-                    <option value="rope">Rope</option>
-                </select>
-            </div>
-
-            <div id="exerciseGrid" class="exercise-grid">
-                <div class="item" style="grid-column: 1 / -1; justify-content: center; padding: 40px 0;">
-                    <span class="muted">Loading live exercises from WorkoutX & Exercise library...</span>
-                </div>
-            </div>
-        </div>
-
-        ${box('Log Workout', `
-            <div class="row">
-                <label style="flex:2;min-width:180px;">
-                    Exercise
-                    <input id="workoutExerciseInput" list="exerciseDatalist" placeholder="e.g. Barbell Bench Press" required>
-                    <datalist id="exerciseDatalist"></datalist>
-                </label>
-                <label style="flex:1;min-width:90px;">
-                    Minutes
-                    <input id="workoutMinutes" type="number" min="1" value="30">
-                </label>
-                <label style="flex:1;min-width:90px;">
-                    Sets
-                    <input id="workoutSets" type="number" min="1" value="3">
-                </label>
-                <label style="flex:1;min-width:90px;">
-                    Reps
-                    <input id="workoutReps" type="number" min="1" value="10">
-                </label>
-                <label style="flex:1;min-width:90px;">
-                    Weight (kg)
-                    <input id="workoutWeight" type="number" min="0" step="0.5" value="0">
-                </label>
-            </div>
-            <div style="margin-top:14px;">
-                ${button('Save Workout Log', 'saveWorkout')}
-            </div>
-        `, 'wide')}
-
-        ${box('Recent Workouts', `
-            <div id="recentWorkoutsList">
-                ${db.workouts.slice(-8).reverse().map(x => `
-                    <div class="item">
-                        <div>
-                            <b>${esc(x.name)}</b>
-                            <p class="muted">${esc(x.date)} · ${x.sets} sets × ${x.reps} reps · ${x.weight} kg</p>
-                        </div>
-                        <span class="tag">${x.minutes} min</span>
-                    </div>
-                `).join('') || '<p class="muted">No workouts logged yet. Pick an exercise above to log your session.</p>'}
-            </div>
-        `, 'wide')}
-    </div>`;
-}
-
-// Fetch and draw exercises from WorkoutX & Exercise backend proxy
-async function loadExercises() {
-    const grid = $('#exerciseGrid');
-    if (!grid) return;
-
-    const search = ($('#exerciseSearch')?.value || '').trim();
-    const bodyPart = $('#bodyPartFilter')?.value || 'all';
-    const equipment = $('#equipmentFilter')?.value || 'all';
-
-    const clientWxKey = getWorkoutXApiKey();
-
-    try {
-        const queryParams = new URLSearchParams();
-        if (search) queryParams.set('search', search);
-        if (bodyPart !== 'all') queryParams.set('bodyPart', bodyPart);
-        if (equipment !== 'all') queryParams.set('equipment', equipment);
-        queryParams.set('limit', '30');
-
-        const headers = {};
-        if (clientWxKey) headers['X-WorkoutX-Key'] = clientWxKey;
-
-        const res = await fetch(`/api/exercises?${queryParams.toString()}`, { headers });
-        const data = await res.json();
-
-        currentExercises = data.exercises || [];
-
-        // Update tag
-        const tag = $('#exerciseSourceTag');
-        if (tag) {
-            if (data.source === 'workoutx') {
-                tag.textContent = `⚡ WorkoutX Live (${data.total || data.count} Exercises)`;
-                tag.className = 'tag';
-                tag.style.background = '#e0f2fe';
-                tag.style.color = '#0284c7';
-            } else {
-                tag.textContent = `Built-in Manual (${data.count} items)`;
-                tag.className = 'tag accent';
-                tag.style.background = '';
-                tag.style.color = '';
-            }
-        }
-
-        // Update datalist for quick logging
-        const datalist = $('#exerciseDatalist');
-        if (datalist) {
-            datalist.innerHTML = currentExercises.map(x => `<option value="${esc(x.name)}"></option>`).join('');
-        }
-
-        if (currentExercises.length === 0) {
-            grid.innerHTML = `
-                <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px;" class="muted">
-                    No exercises found matching "<b>${esc(search)}</b>". Try different keywords or reset filters.
-                </div>
-            `;
-            return;
-        }
-
-        grid.innerHTML = currentExercises.map(ex => {
-            const fallbackImg = 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=500&auto=format&fit=crop&q=80';
-            const imgUrl = ex.poster || ex.gifUrl || fallbackImg;
-            const hasVideo = Boolean(ex.videoUrl);
-
-            return `
-                <div class="exercise-card">
-                    <div class="exercise-card-media">
-                        ${hasVideo ? `<span class="video-pill">▶ HD Loop</span>` : ''}
-                        ${hasVideo ? `
-                            <video autoplay loop muted playsinline poster="${esc(imgUrl)}" src="${esc(ex.videoUrl)}"></video>
-                        ` : `
-                            <img src="${esc(imgUrl)}" alt="${esc(ex.name)}" onerror="this.src='${fallbackImg}'">
-                        `}
-                    </div>
-                    <div class="exercise-card-body">
-                        <h4 class="exercise-card-title">${esc(ex.name)}</h4>
-                        <div class="exercise-card-tags">
-                            <span class="tag">${esc(ex.bodyPart || 'Body')}</span>
-                            <span class="tag accent">${esc(ex.target || 'Target')}</span>
-                            <span class="tag" style="background:#eef2ff;color:#4f46e5">${esc(ex.equipment || 'Equipment')}</span>
-                            ${ex.difficulty ? `<span class="tag" style="background:#fef3c7;color:#b45309;text-transform:capitalize;">${esc(ex.difficulty)}</span>` : ''}
-                        </div>
-                        <div class="exercise-card-actions">
-                            <button class="secondary" data-action="viewManual" data-id="${esc(ex.id || ex.name)}">
-                                📖 View Manual
-                            </button>
-                            <button data-action="selectExercise" data-name="${esc(ex.name)}">
-                                + Log
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }).join('');
-
-    } catch (err) {
-        console.error('Error fetching exercises:', err);
-        grid.innerHTML = `
-            <div style="grid-column: 1 / -1; padding: 24px; background:#fff2f0; color:#b71c1c; border-radius:12px;">
-                <b>Could not load exercises:</b> ${esc(err.message)}
-            </div>
-        `;
-    }
-}
-
-// Open Exercise Manual Modal
-function openExerciseManual(exerciseIdOrName) {
-    const ex = currentExercises.find(x => x.id === exerciseIdOrName || x.name.toLowerCase() === String(exerciseIdOrName).toLowerCase());
-    if (!ex) return;
-
-    selectedExerciseForManual = ex;
-
-    $('#manualTitle').textContent = ex.name;
-    const fallbackImg = 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop&q=80';
-    const videoEl = $('#manualVideo');
-    const imgEl = $('#manualGif');
-
-    if (ex.videoUrl && videoEl) {
-        videoEl.src = ex.videoUrl;
-        videoEl.poster = ex.poster || ex.gifUrl || fallbackImg;
-        videoEl.style.display = 'block';
-        videoEl.play().catch(() => {});
-        if (imgEl) imgEl.style.display = 'none';
-    } else {
-        if (videoEl) {
-            videoEl.pause();
-            videoEl.style.display = 'none';
-        }
-        if (imgEl) {
-            imgEl.src = ex.gifUrl || ex.poster || fallbackImg;
-            imgEl.onerror = () => { imgEl.src = fallbackImg; };
-            imgEl.style.display = 'block';
-        }
+    if (bodyPart && bodyPart !== "all") {
+        const bp = bodyPart.toLowerCase();
+        results = results.filter(x => x.bodyPart.toLowerCase() === bp);
     }
 
-    // Badges
-    const badgesHtml = `
-        <span class="tag"><b>Part:</b> &nbsp;${esc(ex.bodyPart)}</span>
-        <span class="tag accent"><b>Target:</b> &nbsp;${esc(ex.target)}</span>
-        <span class="tag" style="background:#eef2ff;color:#4f46e5"><b>Equipment:</b> &nbsp;${esc(ex.equipment)}</span>
-        ${ex.difficulty ? `<span class="tag" style="background:#fef3c7;color:#b45309;text-transform:capitalize;"><b>Level:</b> &nbsp;${esc(ex.difficulty)}</span>` : ''}
-        ${ex.recommendedSets ? `<span class="tag" style="background:#ede9fe;color:#6d28d9;"><b>Sets/Reps:</b> &nbsp;${esc(ex.recommendedSets)} × ${esc(ex.recommendedReps || '10-15')}</span>` : ''}
-        ${ex.caloriesPerMinute ? `<span class="tag" style="background:#fee2e2;color:#b91c1c;">🔥 ${esc(ex.caloriesPerMinute)} kcal/min</span>` : ''}
-        ${ex.secondaryMuscles?.length ? `<span class="tag" style="background:#f3f4f6;color:#374151"><b>Secondary:</b> &nbsp;${ex.secondaryMuscles.join(', ')}</span>` : ''}
-    `;
-    $('#manualBadges').innerHTML = badgesHtml;
-
-    // Instructions
-    const instructions = Array.isArray(ex.instructions)
-        ? ex.instructions
-        : (typeof ex.instructions === 'string' ? ex.instructions.split('\n').filter(Boolean) : [
-            'Assume the starting position with proper alignment and balance.',
-            'Execute the movement with controlled tempo through the full range of motion.',
-            'Exhale on the concentric (exertion) phase and inhale on the return phase.',
-            'Repeat for target repetitions without bouncing or using momentum.'
-        ]);
-
-    $('#manualInstructions').innerHTML = instructions.map((step, idx) => `
-        <div class="instruction-step">
-            <span class="step-num">${idx + 1}</span>
-            <span class="step-text">${esc(step)}</span>
-        </div>
-    `).join('');
-
-    // Form tips / cues
-    const formCueEl = $('#manualFormCue');
-    if (formCueEl) {
-        if (ex.tips && ex.tips.length > 0) {
-            formCueEl.innerHTML = ex.tips.map(tip => `
-                <div class="trainer-tip-item">
-                    <span>✓</span>
-                    <span>${esc(tip)}</span>
-                </div>
-            `).join('');
-        } else {
-            formCueEl.textContent = 'Keep core braced, maintain steady rhythmic breathing, and never compromise technique for heavier weights.';
-        }
+    if (equipment && equipment !== "all") {
+        const eq = equipment.toLowerCase();
+        results = results.filter(x => x.equipment.toLowerCase().includes(eq));
     }
 
-    $('#exerciseManualDialog').showModal();
-}
-
-// 3. Water Page
-function waterPage() {
-    return `
-    <div class="grid">
-        ${box('Daily Hydration Tracker', `
-            <h2>${water()} / ${db.goals.water} glasses</h2>
-            ${meter(water(), db.goals.water)}
-            <p class="muted">Staying well hydrated promotes physical endurance, mental clarity, and digestion.</p>
-            <div class="row" style="margin-top:16px;">
-                ${button('💧 + Add Glass', 'addWater')}
-                ${button('− Remove Glass', 'removeWater', 'class="secondary"')}
-            </div>
-        `, 'wide')}
-
-        ${box('Set Hydration Goal', `
-            <label>
-                Daily target glasses (250ml each)
-                <input id="waterGoal" type="number" min="1" max="40" value="${db.goals.water}">
-            </label>
-            ${button('Save Hydration Goal', 'saveWaterGoal')}
-        `, 'wide')}
-    </div>`;
-}
-
-// 4. Sleep Page
-function sleepPage() {
-    return `
-    <div class="grid">
-        ${box('Log Sleep Session', `
-            <label>Sleep date <input id="sleepDate" type="date" value="${today}"></label>
-            <div class="row">
-                <label style="flex:1;">Bedtime <input id="bed" type="time" value="23:00"></label>
-                <label style="flex:1;">Wake time <input id="wake" type="time" value="07:00"></label>
-            </div>
-            <p class="muted">Overnight sleep duration is calculated automatically.</p>
-            <div style="margin-top:14px;">
-                ${button('Save Sleep Log', 'saveSleep')}
-            </div>
-        `, 'wide')}
-
-        ${box('Sleep History', `
-            ${db.sleep.slice(-8).reverse().map(x => `
-                <div class="item">
-                    <span>${esc(x.date)}</span>
-                    <b>${x.hours} hours</b>
-                </div>
-            `).join('') || '<p class="muted">No sleep records logged yet.</p>'}
-        `, 'wide')}
-    </div>`;
-}
-
-// 5. Nutrition Page
-function nutritionPage() {
-    return `
-    <div class="grid">
-        ${box('Meal Journal', `
-            <label>Meal Type
-                <select id="mealType">
-                    <option>Breakfast</option>
-                    <option>Lunch</option>
-                    <option>Dinner</option>
-                    <option>Snack</option>
-                </select>
-            </label>
-            <label>What did you eat or drink?
-                <input id="mealText" maxlength="180" placeholder="e.g. Oatmeal with blueberries, Greek yogurt, almonds">
-            </label>
-            <div style="margin-top:14px;">
-                ${button('Add Meal Log', 'saveMeal')}
-            </div>
-        `, 'wide')}
-
-        ${box('Recent Meals', `
-            ${db.meals.slice(-10).reverse().map(x => `
-                <div class="item">
-                    <div>
-                        <b>${esc(x.type)}</b>
-                        <p class="muted">${esc(x.text)}</p>
-                    </div>
-                    <span class="tag">${esc(x.date)}</span>
-                </div>
-            `).join('') || '<p class="muted">No meals logged yet today.</p>'}
-        `, 'wide')}
-    </div>`;
-}
-
-// 6. Mood Page
-function moodPage() {
-    const moods = ['😄 Great', '😊 Good', '😐 Okay', '😔 Low', '😣 Stressed'];
-    const currentMood = db.moods[today] !== undefined ? moods[db.moods[today]] : 'Not logged yet';
-
-    return `
-    <div class="grid">
-        ${box('How are you feeling today?', `
-            <div class="row" style="margin-bottom:16px;">
-                ${['😄', '😊', '😐', '😔', '😣'].map((e, i) => `
-                    <button class="pill secondary" style="font-size:22px;padding:8px 16px;" data-action="mood" data-mood="${i}">
-                        ${e}
-                    </button>
-                `).join('')}
-            </div>
-            <p>Today's mood status: <b>${currentMood}</b></p>
-        `, 'wide')}
-
-        ${box('Recent Mood Log', `
-            ${Object.entries(db.moods).slice(-10).reverse().map(([d, i]) => `
-                <div class="item">
-                    <span>${esc(d)}</span>
-                    <b>${moods[i] || 'Logged'}</b>
-                </div>
-            `).join('') || '<p class="muted">No mood history logged yet.</p>'}
-        `, 'wide')}
-    </div>`;
-}
-
-// 7. Habits Page
-function habitsPage() {
-    return `
-    <div class="grid">
-        ${box('My Daily Habits', habitRows(), 'wide')}
-
-        ${box('Create a New Habit', `
-            <label>Habit Name
-                <input id="habitName" maxlength="65" placeholder="e.g. 10 minutes foam rolling or mobility">
-            </label>
-            <div style="margin-top:14px;">
-                ${button('+ Add Habit', 'addHabit')}
-            </div>
-            <p class="muted" style="margin-top:12px;">Habit streaks are tracked privately in your local browser storage.</p>
-        `, 'wide')}
-    </div>`;
-}
-
-// 8. Cycle Tracker Page
-function cyclePage() {
-    const stats = getCycleStats();
-
-    // Segment widths for 4 phases
-    const L = stats.totalDays;
-    const dur = stats.periodDuration;
-    const ov = stats.ovulationDay;
-    const menstrualPct = Math.round((dur / L) * 100);
-    const follicularPct = Math.max(5, Math.round(((ov - dur - 1) / L) * 100));
-    const ovulatoryPct = Math.max(5, Math.round((3 / L) * 100));
-    const lutealPct = Math.max(5, 100 - (menstrualPct + follicularPct + ovulatoryPct));
-
-    const cursorPct = stats.hasData
-        ? Math.min(97, Math.max(3, (stats.cycleDay / L) * 100))
-        : 0;
-
-    return `
-    <div class="grid">
-        <!-- Hero Card with Big Cycle Count -->
-        <div class="card full" style="padding:0;overflow:hidden;border:none;">
-            <div class="cycle-hero-card">
-                <div class="cycle-hero-info">
-                    <span class="eyebrow" style="color:#fbcfe8;">MENSTRUAL CYCLE TRACKER & COUNT</span>
-                    <h2>${stats.hasData ? `${stats.phaseIcon} Day ${stats.cycleDay} of ${stats.totalDays}` : 'Track Your Menstrual Cycle 🌸'}</h2>
-                    <p>
-                        ${stats.hasData
-                            ? `You are currently in the <b>${stats.phase}</b>. ${stats.isLate ? `Your cycle is <b>${stats.daysLate} day(s) past expected duration</b>.` : `Next period estimated in <b>${stats.daysUntilNext} days</b> (${stats.nextPeriodDate}).`}`
-                            : 'Log your period start date below to calculate your current cycle day count, monitor phases, and get personalized workout coaching.'}
-                    </p>
-                </div>
-                <div class="cycle-day-box">
-                    <div class="big-day">${stats.hasData ? `Day ${stats.cycleDay}` : '—'}</div>
-                    <div class="day-sub">${stats.hasData ? `of ${stats.totalDays} Days` : 'Not Logged'}</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Segmented Cycle Phase Progress Bar -->
-        ${stats.hasData ? `
-            <div class="card full">
-                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-                    <h3 style="margin:0;">Cycle Phase Journey</h3>
-                    <span class="tag" style="background:${stats.phaseColor}20;color:${stats.phaseColor};font-weight:700;">
-                        ${stats.phaseIcon} Current: ${stats.phase} (Day ${stats.cycleDay})
-                    </span>
-                </div>
-
-                <div class="cycle-segmented-bar-wrapper">
-                    <div class="cycle-marker-cursor" style="left:${cursorPct}%;">
-                        <span class="cycle-marker-pill">Today · Day ${stats.cycleDay}</span>
-                        <div class="cycle-marker-arrow"></div>
-                    </div>
-                    <div class="cycle-segmented-bar">
-                        <div class="cycle-seg menstrual" style="width:${menstrualPct}%;" title="Menstrual Phase: Days 1-${dur}"></div>
-                        <div class="cycle-seg follicular" style="width:${follicularPct}%;" title="Follicular Phase: Days ${dur + 1}-${ov - 1}"></div>
-                        <div class="cycle-seg ovulatory" style="width:${ovulatoryPct}%;" title="Ovulatory Window: Days ${ov}-${ov + 2}"></div>
-                        <div class="cycle-seg luteal" style="width:${lutealPct}%;" title="Luteal Phase: Days ${ov + 3}-${L}"></div>
-                    </div>
-                </div>
-
-                <div class="cycle-legend">
-                    <span class="cycle-legend-item"><i class="cycle-dot menstrual"></i> <b>Menstrual:</b> Days 1–${dur}</span>
-                    <span class="cycle-legend-item"><i class="cycle-dot follicular"></i> <b>Follicular:</b> Days ${dur + 1}–${ov - 1}</span>
-                    <span class="cycle-legend-item"><i class="cycle-dot ovulatory"></i> <b>Ovulatory:</b> Days ${ov}–${ov + 2}</span>
-                    <span class="cycle-legend-item"><i class="cycle-dot luteal"></i> <b>Luteal:</b> Days ${ov + 3}–${L}</span>
-                </div>
-            </div>
-        ` : ''}
-
-        <!-- 4 Cycle Count Metric Cards -->
-        ${[
-            ['🔢', 'Current Cycle Day', stats.hasData ? `Day ${stats.cycleDay}` : '—', stats.cycleDay, stats.totalDays],
-            ['⏳', 'Next Period Countdown', stats.hasData ? (stats.isLate ? `+${stats.daysLate}d Late` : `${stats.daysUntilNext} days`) : '—', stats.hasData ? Math.max(0, stats.totalDays - stats.daysUntilNext) : 0, stats.totalDays],
-            ['🔄', 'Total Tracked Cycles', `${stats.totalCycles} cycles`, stats.totalCycles, Math.max(1, stats.totalCycles)],
-            ['⏱️', 'Average Cycle Length', `${stats.avgLength} days`, stats.avgLength, 40]
-        ].map(([i, t, v, n, d]) => `
-            <div class="card metric">
-                <div class="icon">${i}</div>
-                <p class="muted">${t}</p>
-                <h2>${v}</h2>
-                ${meter(n, d)}
-            </div>
-        `).join('')}
-
-        <!-- Phase-Specific Training & Nutrition Coaching -->
-        <div class="card full">
-            <h3>
-                <span>${stats.phaseIcon} ${stats.phase} Wellness Coaching</span>
-                <button class="pill secondary" data-action="cycleAI">✨ Ask Mistral AI About This Phase</button>
-            </h3>
-            <p class="muted">${stats.phaseDescription}</p>
-
-            <div class="cycle-guide-grid">
-                <div class="cycle-guide-col">
-                    <b>🏋️ Recommended Exercise & Energy Focus:</b>
-                    <p>${stats.phaseWorkoutTip}</p>
-                </div>
-                <div class="cycle-guide-col">
-                    <b>🥗 Phase-Specific Nutrition & Hydration:</b>
-                    <p>${stats.phaseNutritionTip}</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Log New Cycle Form -->
-        ${box('Log Period / Cycle Entry', `
-            <p class="muted">Record when your period begins. Your cycle count and phase metrics will update automatically.</p>
-            <div class="row">
-                <label style="flex:1;min-width:180px;">
-                    Period start date
-                    <input type="date" id="cycleDate" value="${today}">
-                </label>
-                <label style="flex:1;min-width:130px;">
-                    Typical cycle length (days)
-                    <input type="number" id="cycleLength" value="${stats.latestCycle?.length || 28}" min="15" max="60">
-                </label>
-                <label style="flex:1;min-width:130px;">
-                    Bleeding duration (days)
-                    <input type="number" id="cycleDuration" value="${stats.latestCycle?.duration || 5}" min="1" max="15">
-                </label>
-                <label style="flex:1;min-width:140px;">
-                    Flow intensity
-                    <select id="cycleFlow">
-                        <option value="medium">Medium flow</option>
-                        <option value="heavy">Heavy flow</option>
-                        <option value="light">Light flow</option>
-                        <option value="spotting">Spotting</option>
-                    </select>
-                </label>
-            </div>
-
-            <label style="margin-top:14px;">Symptoms & sensations (check all that apply):</label>
-            <div class="symptoms-selector">
-                ${[
-                    ['cramps', '🩸 Cramps'],
-                    ['fatigue', '😴 Fatigue'],
-                    ['bloating', '🎈 Bloating'],
-                    ['headache', '🤕 Headache'],
-                    ['tender_breasts', '🌸 Tender Breasts'],
-                    ['mood_swings', '🎭 Mood Swings'],
-                    ['back_pain', '⚡ Back Pain'],
-                    ['high_energy', '⚡ High Energy'],
-                    ['acne', '✨ Acne'],
-                    ['cravings', '🍫 Cravings']
-                ].map(([val, label]) => `
-                    <label class="symptom-tag-label">
-                        <input type="checkbox" class="symptom-checkbox" value="${val}">
-                        ${label}
-                    </label>
-                `).join('')}
-            </div>
-
-            <label>Notes / Journal
-                <textarea id="cycleNotes" rows="2" placeholder="Energy levels, workout feelings, cravings, sleep notes..."></textarea>
-            </label>
-            <div style="margin-top:14px;">
-                ${button('Save Cycle Log', 'saveCycle')}
-            </div>
-        `, 'wide')}
-
-        <!-- Cycle History List -->
-        ${box(`Cycle History (${stats.totalCycles} Recorded)`, `
-            <div id="cycleHistoryList">
-                ${stats.sortedCycles.slice().reverse().map((x, idx) => {
-                    const cycleNum = stats.sortedCycles.length - idx;
-                    const nextEst = new Date(new Date(x.start + 'T12:00:00').getTime() + (Number(x.length) || 28) * 86400000).toLocaleDateString();
-                    const symptomList = Array.isArray(x.symptoms) ? x.symptoms : [];
-                    return `
-                        <div class="cycle-history-item">
-                            <div style="flex:1;">
-                                <div class="cycle-history-header">
-                                    <span class="cycle-num-badge">Cycle #${cycleNum}</span>
-                                    <b>Started: ${esc(x.start)}</b>
-                                    <span class="tag">${x.length || 28}d cycle · ${x.duration || 5}d period</span>
-                                    <span class="tag accent" style="text-transform:capitalize;">${esc(x.flow || 'Medium')} flow</span>
-                                </div>
-                                <p class="muted" style="margin:4px 0;">${esc(x.notes || 'No notes added.')}</p>
-                                ${symptomList.length ? `
-                                    <div class="cycle-symptom-pills">
-                                        ${symptomList.map(s => `<span class="cycle-symptom-pill">${esc(s.replace('_', ' '))}</span>`).join('')}
-                                    </div>
-                                ` : ''}
-                                <div style="font-size:12px;color:var(--text-muted);margin-top:6px;">
-                                    Next estimated: <b>${nextEst}</b>
-                                </div>
-                            </div>
-                            <button class="icon-btn" data-action="deleteCycle" data-id="${x.id || x.start}" title="Delete cycle record">🗑️</button>
-                        </div>
-                    `;
-                }).join('') || '<p class="muted">No cycle logs saved yet. Add your period start date above to start tracking your cycle counts!</p>'}
-            </div>
-        `, 'wide')}
-    </div>`;
-}
-
-// 9. Analytics Page
-function analyticsPage() {
-    const cycleStats = getCycleStats();
-
-    return `
-    <div class="grid">
-        ${box('Water Intake — Last 7 Days', '<canvas id="waterChart"></canvas>', 'wide')}
-        ${box('Activity Minutes — Last 7 Days', '<canvas id="activityChart"></canvas>', 'wide')}
-
-        ${db.profile.cycle !== false && cycleStats.totalCycles > 0 ? `
-            ${box('Menstrual Cycle Length Trends', '<canvas id="cycleChart"></canvas>', 'wide')}
-            ${box('Cycle Count & Rhythm Summary', `
-                <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:12px; margin-bottom:14px;">
-                    <div class="card metric" style="padding:14px;">
-                        <p class="muted">Current Day</p>
-                        <h2 style="font-size:20px;">Day ${cycleStats.cycleDay}</h2>
-                    </div>
-                    <div class="card metric" style="padding:14px;">
-                        <p class="muted">Active Phase</p>
-                        <h2 style="font-size:16px;">${cycleStats.phaseIcon} ${cycleStats.phase.split(' ')[0]}</h2>
-                    </div>
-                    <div class="card metric" style="padding:14px;">
-                        <p class="muted">Avg Cycle</p>
-                        <h2 style="font-size:20px;">${cycleStats.avgLength}d</h2>
-                    </div>
-                    <div class="card metric" style="padding:14px;">
-                        <p class="muted">Total Cycles</p>
-                        <h2 style="font-size:20px;">${cycleStats.totalCycles}</h2>
-                    </div>
-                </div>
-                <div class="row">
-                    ${button('🌸 Open Cycle Tracker', 'goCycle', 'class="secondary"')}
-                    ${button('✨ AI Cycle Insights', 'cycleAI')}
-                </div>
-            `, 'wide')}
-        ` : ''}
-
-        ${box('Overall Wellness Progress', `
-            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:14px; margin-bottom:18px;">
-                <div class="card metric" style="padding:16px;">
-                    <p class="muted">Total Workouts</p>
-                    <h2>${db.workouts.length}</h2>
-                </div>
-                <div class="card metric" style="padding:16px;">
-                    <p class="muted">Sleep Entries</p>
-                    <h2>${db.sleep.length}</h2>
-                </div>
-                <div class="card metric" style="padding:16px;">
-                    <p class="muted">Meals Tracked</p>
-                    <h2>${db.meals.length}</h2>
-                </div>
-                <div class="card metric" style="padding:16px;">
-                    <p class="muted">Today's Habits</p>
-                    <h2>${completed()} / ${db.habits.length}</h2>
-                </div>
-            </div>
-            <div class="row">
-                ${button('✨ Ask Mistral AI for a Weekly Summary', 'weeklyAI')}
-            </div>
-        `, 'full')}
-    </div>`;
-}
-
-// Chart.js renderer
-function renderCharts() {
-    if (typeof Chart === 'undefined') return;
-
-    // Destroy existing instances to prevent memory leak / canvas reuse errors
-    if (chartInstances.water) chartInstances.water.destroy();
-    if (chartInstances.activity) chartInstances.activity.destroy();
-    if (chartInstances.cycle) chartInstances.cycle.destroy();
-
-    const days = Array.from({ length: 7 }, (_, i) => {
-        let d = new Date();
-        d.setDate(d.getDate() - (6 - i));
-        return d.toLocaleDateString('en-CA');
-    });
-
-    const waterCanvas = $('#waterChart');
-    if (waterCanvas) {
-        chartInstances.water = new Chart(waterCanvas, {
-            type: 'bar',
-            data: {
-                labels: days.map(x => x.slice(5)),
-                datasets: [{
-                    label: 'Water Glasses',
-                    data: days.map(d => db.water[d] || 0),
-                    backgroundColor: '#1f7a55',
-                    borderRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true } }
-            }
-        });
+    if (search && search.trim()) {
+        const q = search.trim().toLowerCase();
+        results = results.filter(x =>
+            x.name.toLowerCase().includes(q) ||
+            x.target.toLowerCase().includes(q) ||
+            x.bodyPart.toLowerCase().includes(q) ||
+            x.equipment.toLowerCase().includes(q) ||
+            (x.secondaryMuscles && x.secondaryMuscles.some(m => m.toLowerCase().includes(q)))
+        );
     }
 
-    const activityCanvas = $('#activityChart');
-    if (activityCanvas) {
-        chartInstances.activity = new Chart(activityCanvas, {
-            type: 'bar',
-            data: {
-                labels: days.map(x => x.slice(5)),
-                datasets: [{
-                    label: 'Exercise Minutes',
-                    data: days.map(d => db.workouts.filter(w => w.date === d).reduce((a, w) => a + Number(w.minutes || 0), 0)),
-                    backgroundColor: '#3e9c74',
-                    borderRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true } }
-            }
-        });
-    }
-
-    const cycleCanvas = $('#cycleChart');
-    const cycleStats = getCycleStats();
-    if (cycleCanvas && cycleStats.totalCycles > 0) {
-        const cycleLabels = cycleStats.sortedCycles.map((c, idx) => `Cycle #${idx + 1} (${c.start.slice(5)})`);
-        const cycleLengths = cycleStats.sortedCycles.map(c => Number(c.length) || 28);
-        const cycleDurations = cycleStats.sortedCycles.map(c => Number(c.duration) || 5);
-
-        chartInstances.cycle = new Chart(cycleCanvas, {
-            type: 'bar',
-            data: {
-                labels: cycleLabels,
-                datasets: [
-                    {
-                        label: 'Cycle Length (days)',
-                        data: cycleLengths,
-                        backgroundColor: '#7c3aed',
-                        borderRadius: 6
-                    },
-                    {
-                        label: 'Period Duration (days)',
-                        data: cycleDurations,
-                        backgroundColor: '#f43f5e',
-                        borderRadius: 6
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                scales: { y: { beginAtZero: true, suggestedMax: 35 } }
-            }
-        });
-    }
+    const total = results.length;
+    const paginated = results.slice(offset, offset + limit);
+    return { exercises: paginated, total };
 }
 
-// Main Render Function
-function render() {
-    nav();
-    $('#today').textContent = new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-    $('#pageTitle').textContent = page === 'Dashboard' ? 'Your wellness, simplified.' : page;
-
-    const views = {
-        Dashboard: dashboard,
-        Exercise: exercisePage,
-        Water: waterPage,
-        Sleep: sleepPage,
-        Nutrition: nutritionPage,
-        Mood: moodPage,
-        Habits: habitsPage,
-        'Cycle Tracker': cyclePage,
-        Analytics: analyticsPage
+// Module export for Node.js / Window global for browser
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        BUILTIN_EXERCISES,
+        transformWorkoutXExercise,
+        filterBuiltinExercises
     };
-
-    $('#content').innerHTML = (views[page] || dashboard)();
-
-    if (page === 'Exercise') {
-        loadExercises();
-    } else if (page === 'Analytics') {
-        renderCharts();
-    }
 }
 
-function go(targetPage) {
-    page = targetPage;
-    render();
+if (typeof window !== 'undefined') {
+    window.BUILTIN_EXERCISES = BUILTIN_EXERCISES;
+    window.transformWorkoutXExercise = transformWorkoutXExercise;
+    window.filterBuiltinExercises = filterBuiltinExercises;
 }
-
-// ----------------- Global Click & Event Handlers -----------------
-
-document.addEventListener('click', e => {
-    // Navigation
-    const navBtn = e.target.closest('[data-page]');
-    if (navBtn) {
-        return go(navBtn.dataset.page);
-    }
-
-    // Action buttons
-    const actionBtn = e.target.closest('[data-action]');
-    if (!actionBtn) return;
-
-    const action = actionBtn.dataset.action;
-
-    if (action === 'addWater') {
-        db.water[today] = Math.max(0, water() + 1);
-    } else if (action === 'removeWater') {
-        db.water[today] = Math.max(0, water() - 1);
-    } else if (action === 'saveWaterGoal') {
-        db.goals.water = Math.max(1, Number($('#waterGoal').value) || 8);
-    } else if (action === 'goSleep') {
-        return go('Sleep');
-    } else if (action === 'goExercise') {
-        return go('Exercise');
-    } else if (action === 'openAssistant') {
-        openChat();
-        return;
-    } else if (action === 'saveSleep') {
-        const bed = $('#bed').value.split(':').map(Number);
-        const wake = $('#wake').value.split(':').map(Number);
-        if (bed.length < 2 || wake.length < 2) return alert('Please enter both bed and wake times');
-        const mins = (wake[0] * 60 + wake[1] - bed[0] * 60 - bed[1] + 1440) % 1440;
-        db.sleep.push({
-            date: $('#sleepDate').value || today,
-            hours: +(mins / 60).toFixed(2)
-        });
-    } else if (action === 'viewManual') {
-        const id = actionBtn.dataset.id;
-        openExerciseManual(id);
-        return;
-    } else if (action === 'selectExercise') {
-        const name = actionBtn.dataset.name;
-        const input = $('#workoutExerciseInput');
-        if (input) {
-            input.value = name;
-            input.focus();
-            input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-        return;
-    } else if (action === 'saveWorkout') {
-        const name = ($('#workoutExerciseInput')?.value || '').trim();
-        if (!name) return alert('Please enter or select an exercise name');
-        db.workouts.push({
-            date: today,
-            name,
-            minutes: +$('#workoutMinutes').value || 30,
-            sets: +$('#workoutSets').value || 3,
-            reps: +$('#workoutReps').value || 10,
-            weight: +$('#workoutWeight').value || 0
-        });
-        if ($('#workoutExerciseInput')) $('#workoutExerciseInput').value = '';
-    } else if (action === 'saveMeal') {
-        const val = ($('#mealText').value || '').trim();
-        if (!val) return alert('Please enter what you ate or drank.');
-        db.meals.push({
-            date: today,
-            type: $('#mealType').value,
-            text: val
-        });
-        $('#mealText').value = '';
-    } else if (action === 'mood') {
-        db.moods[today] = +actionBtn.dataset.mood;
-    } else if (action === 'addHabit') {
-        const val = ($('#habitName').value || '').trim();
-        if (!val) return;
-        db.habits.push({ id: Date.now(), name: val, days: [] });
-        $('#habitName').value = '';
-    } else if (action === 'goCycle') {
-        return go('Cycle Tracker');
-    } else if (action === 'cycleAI') {
-        openChat();
-        const stats = getCycleStats();
-        if (stats.hasData) {
-            sendChatMessage(`I am on Day ${stats.cycleDay} of my menstrual cycle (${stats.phase}). Based on this phase, what workout intensity, exercises from the Exercise manual, and nutrition habits should I prioritize today?`);
-        } else {
-            sendChatMessage("Can you explain how tracking menstrual cycle counts and phases (Menstrual, Follicular, Ovulatory, Luteal) helps optimize fitness training and nutrition?");
-        }
-        return;
-    } else if (action === 'deleteCycle') {
-        const cycleId = actionBtn.dataset.id;
-        if (confirm('Delete this cycle log record?')) {
-            db.cycles = db.cycles.filter(c => String(c.id || c.start) !== String(cycleId));
-            save();
-            render();
-        }
-        return;
-    } else if (action === 'saveCycle') {
-        if (!$('#cycleDate').value) return alert('Please enter a period start date');
-        const selectedSymptoms = [...$$('.symptom-checkbox:checked')].map(cb => cb.value);
-        db.cycles.push({
-            id: Date.now(),
-            start: $('#cycleDate').value,
-            length: +$('#cycleLength').value || 28,
-            duration: +$('#cycleDuration').value || 5,
-            flow: $('#cycleFlow')?.value || 'medium',
-            symptoms: selectedSymptoms,
-            notes: ($('#cycleNotes')?.value || '').trim()
-        });
-    } else if (action === 'weeklyAI') {
-        openChat();
-        sendChatMessage("Please analyze my logged wellness data from this week (habits, water, workouts, sleep, and moods) and provide a supportive summary with 3 actionable improvements.");
-        return;
-    }
-
-    save();
-    render();
-});
-
-// Habit checkbox toggle
-document.addEventListener('change', e => {
-    if (e.target.matches('[data-habit]')) {
-        const habitId = +e.target.dataset.habit;
-        const habit = db.habits.find(h => h.id === habitId);
-        if (!habit) return;
-        habit.days = e.target.checked
-            ? [...new Set([...habit.days, today])]
-            : habit.days.filter(d => d !== today);
-        save();
-        render();
-    }
-});
-
-// Exercise filtering inputs
-document.addEventListener('input', e => {
-    if (e.target.id === 'exerciseSearch' || e.target.id === 'bodyPartFilter' || e.target.id === 'equipmentFilter') {
-        clearTimeout(exerciseSearchTimeout);
-        exerciseSearchTimeout = setTimeout(() => {
-            loadExercises();
-        }, 300);
-    }
-});
-
-// Manual Modal Actions
-const closeManualModal = () => {
-    const videoEl = $('#manualVideo');
-    if (videoEl) videoEl.pause();
-    $('#exerciseManualDialog').close();
-};
-$('#closeManualBtn').onclick = closeManualModal;
-$('#closeManualFooterBtn').onclick = closeManualModal;
-$('#logThisExerciseBtn').onclick = () => {
-    if (selectedExerciseForManual) {
-        closeManualModal();
-        go('Exercise');
-        setTimeout(() => {
-            const input = $('#workoutExerciseInput');
-            if (input) {
-                input.value = selectedExerciseForManual.name;
-                input.focus();
-                input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        }, 100);
-    }
-};
-
-// Profile Dialog Actions
-$('#profileBtn').onclick = () => {
-    $('#nameInput').value = db.profile.name;
-    $('#genderInput').value = db.profile.gender;
-    $('#cycleEnabled').checked = db.profile.cycle;
-    $('#profileDialog').showModal();
-};
-
-$('#profileForm').addEventListener('submit', e => {
-    if (e.submitter?.value !== 'save') return;
-    db.profile = {
-        name: $('#nameInput').value.trim() || 'Friend',
-        gender: $('#genderInput').value,
-        cycle: $('#cycleEnabled').checked
-    };
-    save();
-    if (!db.profile.cycle && page === 'Cycle Tracker') {
-        page = 'Dashboard';
-    }
-    render();
-});
-
-// API Settings Dialog
-function openSettingsModal() {
-    $('#mistralKeyInput').value = localStorage.getItem('welllife_mistral_key') || '';
-    if ($('#workoutxKeyInput')) {
-        $('#workoutxKeyInput').value = localStorage.getItem('welllife_workoutx_key') || getWorkoutXApiKey();
-    }
-
-    fetch('/api/status')
-        .then(r => r.json())
-        .then(status => {
-            const msg = $('#apiStatusMessage');
-            if (msg) {
-                msg.innerHTML = `
-                    <div style="background:#f4f8f5;padding:10px 14px;border-radius:8px;">
-                        <div>⚡ <b>WorkoutX API:</b> ${status.workoutxConfigured ? '✅ Active (2,760+ HD Video Exercises)' : '⚠️ Key not set'}</div>
-                        <div>🤖 <b>Mistral AI:</b> ${status.mistralConfigured ? '✅ Active' : '⚠️ Not set in server env'}</div>
-                    </div>
-                `;
-            }
-        })
-        .catch(() => {});
-
-    $('#settingsDialog').showModal();
-}
-
-$('#settingsBtn').onclick = openSettingsModal;
-$('#chatSettingsBtn').onclick = openSettingsModal;
-$('#closeSettingsBtn').onclick = () => $('#settingsDialog').close();
-$('#closeSettingsFooterBtn').onclick = () => $('#settingsDialog').close();
-
-$('#saveApiSettingsBtn').onclick = () => {
-    const mistralKey = $('#mistralKeyInput').value.trim();
-    const workoutxKey = $('#workoutxKeyInput')?.value?.trim();
-
-    if (mistralKey) {
-        localStorage.setItem('welllife_mistral_key', mistralKey);
-    } else {
-        localStorage.removeItem('welllife_mistral_key');
-    }
-
-    if (workoutxKey) {
-        localStorage.setItem('welllife_workoutx_key', workoutxKey);
-    } else {
-        localStorage.removeItem('welllife_workoutx_key');
-    }
-
-    $('#settingsDialog').close();
-    if (page === 'Exercise') loadExercises();
-    bubble('API keys saved! WorkoutX Live Library and AI assistant are active.', 'bot');
-};
-
-// ----------------- Mistral AI Floating Assistant -----------------
-
-function openChat() {
-    $('#chatPanel').classList.remove('hidden');
-    $('#chatInput')?.focus();
-}
-
-function closeChat() {
-    $('#chatPanel').classList.add('hidden');
-}
-
-$('#chatToggle').onclick = () => {
-    if ($('#chatPanel').classList.contains('hidden')) {
-        openChat();
-    } else {
-        closeChat();
-    }
-};
-
-$('#closeChat').onclick = closeChat;
-
-$('#clearChatBtn').onclick = () => {
-    $('#messages').innerHTML = `
-        <div class="bubble bot">
-            Chat cleared! How can I assist you with your fitness, exercises, and wellness routines today?
-        </div>
-    `;
-};
-
-// Suggestion chips
-$$('.chat-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-        const prompt = chip.dataset.prompt;
-        if (prompt) {
-            openChat();
-            sendChatMessage(prompt);
-        }
-    });
-});
-
-// Format markdown text simply for chat display
-function formatMarkdown(text) {
-    if (!text) return '';
-    let html = esc(text);
-
-    // Bold **text**
-    html = html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-
-    // Italic *text*
-    html = html.replace(/\*(.*?)\*/g, '<i>$1</i>');
-
-    // Code `text`
-    html = html.replace(/`(.*?)`/g, '<code style="background:rgba(0,0,0,0.06);padding:2px 4px;border-radius:4px;">$1</code>');
-
-    // Line breaks
-    html = html.replace(/\n/g, '<br>');
-
-    return html;
-}
-
-function bubble(text, kind, isTyping = false) {
-    const el = document.createElement('div');
-    el.className = 'bubble ' + kind;
-    if (isTyping) {
-        el.className += ' typing';
-        el.innerHTML = '<span></span><span></span><span></span>';
-    } else {
-        el.innerHTML = formatMarkdown(text);
-    }
-    const messages = $('#messages');
-    messages.appendChild(el);
-    messages.scrollTop = messages.scrollHeight;
-    return el;
-}
-
-async function sendChatMessage(message) {
-    bubble(message, 'user');
-    const typingIndicator = bubble('', 'bot', true);
-
-    const cycleStats = getCycleStats();
-    const context = $('#aiConsent').checked ? {
-        profile: { name: db.profile.name, gender: db.profile.gender },
-        date: today,
-        water: { today: water(), goal: db.goals.water },
-        sleep: db.sleep.slice(-7),
-        workouts: db.workouts.slice(-10),
-        habits: db.habits.map(h => ({ name: h.name, completedToday: h.days.includes(today) })),
-        meals: db.meals.slice(-8),
-        moods: db.moods,
-        menstrualCycle: (db.profile.cycle !== false && cycleStats.hasData) ? {
-            currentCycleDay: cycleStats.cycleDay,
-            typicalCycleLength: cycleStats.totalDays,
-            currentPhase: cycleStats.phase,
-            daysUntilNextPeriod: cycleStats.daysUntilNext,
-            isLate: cycleStats.isLate,
-            daysLate: cycleStats.daysLate,
-            totalCyclesTracked: cycleStats.totalCycles,
-            averageCycleLength: cycleStats.avgLength,
-            averagePeriodDuration: cycleStats.avgDuration,
-            latestSymptoms: cycleStats.latestCycle?.symptoms || [],
-            latestNotes: cycleStats.latestCycle?.notes || ''
-        } : null,
-        cycles: db.profile.cycle !== false ? db.cycles.slice(-3) : []
-    } : {};
-
-    const clientMistralKey = localStorage.getItem('welllife_mistral_key') || undefined;
-
-    try {
-        const res = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                message,
-                context,
-                apiKey: clientMistralKey
-            })
-        });
-
-        const data = await res.json();
-        typingIndicator.remove();
-
-        if (!res.ok) {
-            throw new Error(data.error || 'Mistral AI service unavailable');
-        }
-
-        bubble(data.reply || 'No response generated.', 'bot');
-    } catch (err) {
-        typingIndicator.remove();
-        bubble(`⚠️ Could not reach Mistral AI: ${err.message}\n\nPlease check your MISTRAL_API_KEY in the server terminal or click ⚙️ API Settings to enter your key.`, 'bot');
-    }
-}
-
-$('#chatForm').onsubmit = async e => {
-    e.preventDefault();
-    const input = $('#chatInput');
-    const message = input.value.trim();
-    if (!message) return;
-    input.value = '';
-    await sendChatMessage(message);
-};
-
-// Initial startup render
-render();

@@ -1,1221 +1,1670 @@
-:root {
-    --primary: #1f7a55;
-    --primary-hover: #196345;
-    --primary-light: #e6f6ee;
-    --primary-border: #bfe5d1;
-    --accent: #ff7849;
-    --accent-light: #fff0eb;
-    --background: #f5f8f6;
-    --surface: #ffffff;
-    --text: #1d2b24;
-    --text-muted: #64756c;
-    --border: #e2ebe6;
-    --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.04);
-    --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 14px 38px rgba(20, 50, 35, 0.15);
-    --radius-sm: 8px;
-    --radius-md: 14px;
-    --radius-lg: 20px;
-    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-}
-
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    font-family: var(--font);
-    background: var(--background);
-    color: var(--text);
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-}
-
-button, input, select, textarea {
-    font: inherit;
-}
-
-button {
-    cursor: pointer;
-    border: none;
-    border-radius: var(--radius-sm);
-    padding: 10px 16px;
-    background: var(--primary);
-    color: white;
-    font-weight: 500;
-    transition: background 0.18s ease, transform 0.12s ease, opacity 0.18s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-button:hover {
-    background: var(--primary-hover);
-}
-
-button:active {
-    transform: scale(0.98);
-}
-
-button.secondary {
-    background: var(--primary-light);
-    color: var(--primary);
-}
-
-button.secondary:hover {
-    background: #d4edd0;
-}
-
-button.pill {
-    border-radius: 999px;
-    padding: 7px 16px;
-    font-size: 13px;
-}
-
-button.icon-btn {
-    padding: 8px;
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    background: transparent;
-    color: var(--text-muted);
-}
-
-button.icon-btn:hover {
-    background: rgba(0, 0, 0, 0.06);
-    color: var(--text);
-}
-
-/* App Layout */
-.app {
-    display: flex;
-    min-height: 100vh;
-}
-
-/* Sidebar */
-.sidebar {
-    width: 260px;
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    padding: 24px 16px;
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-}
-
-.brand {
-    font-size: 22px;
-    font-weight: 800;
-    color: var(--primary);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.brand span {
-    background: var(--primary-light);
-    color: var(--primary);
-    padding: 2px 7px;
-    border-radius: 6px;
-    font-size: 13px;
-    letter-spacing: 0.5px;
-}
-
-.brand-sub {
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--text-muted);
-    letter-spacing: 1px;
-    margin: 4px 0 24px 0;
-}
-
-#nav {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-#nav button {
-    text-align: left;
-    background: transparent;
-    color: var(--text);
-    padding: 11px 14px;
-    border-radius: var(--radius-sm);
-    justify-content: flex-start;
-    font-size: 14.5px;
-}
-
-#nav button:hover {
-    background: var(--primary-light);
-    color: var(--primary);
-}
-
-#nav button.active {
-    background: var(--primary-light);
-    color: var(--primary);
-    font-weight: 700;
-    border-left: 3px solid var(--primary);
-}
-
-.sidefoot {
-    margin-top: auto;
-    font-size: 12px;
-    color: var(--text-muted);
-    padding-top: 16px;
-    border-top: 1px solid var(--border);
-    text-align: center;
-}
-
-/* Main Area */
-.main {
-    flex: 1;
-    min-width: 0;
-    padding: 32px 36px;
-    max-width: 1300px;
-}
-
-.topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 28px;
-    gap: 16px;
-    flex-wrap: wrap;
-}
-
-.eyebrow {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    color: var(--primary);
-    text-transform: uppercase;
-}
-
-.topbar h1 {
-    margin: 4px 0 0;
-    font-size: 28px;
-    font-weight: 800;
-}
-
-.topbar-right {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-#today {
-    font-size: 13.5px;
-    color: var(--text-muted);
-    background: white;
-    padding: 6px 14px;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    font-weight: 500;
-}
-
-/* Hero Section */
-.hero {
-    background: linear-gradient(135deg, #1f7a55 0%, #3e9c74 100%);
-    color: white;
-    padding: 32px;
-    border-radius: var(--radius-lg);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-    box-shadow: 0 8px 24px rgba(31, 122, 85, 0.2);
-}
-
-.hero h2 {
-    margin: 8px 0;
-    font-size: 26px;
-    font-weight: 800;
-}
-
-.hero p {
-    margin: 0;
-    opacity: 0.92;
-    font-size: 14.5px;
-}
-
-.score-circle {
-    width: 100px;
-    height: 100px;
-    border: 7px solid rgba(255, 255, 255, 0.35);
-    border-top-color: #ffffff;
-    border-radius: 50%;
-    display: grid;
-    place-items: center;
-    font-size: 24px;
-    font-weight: 800;
-    background: rgba(0, 0, 0, 0.1);
-}
-
-/* Dashboard Cards Grid */
-.grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 20px;
-}
-
-.card {
-    background: var(--surface);
-    padding: 22px;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-sm);
-    min-width: 0;
-}
-
-.card h3 {
-    margin-top: 0;
-    margin-bottom: 14px;
-    font-size: 17px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-}
-
-.card.wide {
-    grid-column: span 2;
-}
-
-.card.full {
-    grid-column: 1 / -1;
-}
-
-.metric .icon {
-    font-size: 26px;
-    margin-bottom: 6px;
-}
-
-.metric h2 {
-    font-size: 22px;
-    margin: 6px 0 12px;
-    font-weight: 800;
-}
-
-.bar {
-    height: 10px;
-    background: #edf2ef;
-    border-radius: 999px;
-    overflow: hidden;
-    margin-top: 8px;
-}
-
-.bar i {
-    display: block;
-    height: 100%;
-    background: var(--primary);
-    border-radius: 999px;
-    transition: width 0.35s ease;
-}
-
-.row {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    align-items: center;
-}
-
-.item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--border);
-}
-
-.item:last-child {
-    border-bottom: none;
-}
-
-.tag {
-    background: var(--primary-light);
-    color: var(--primary);
-    border-radius: 999px;
-    padding: 4px 10px;
-    font-size: 12px;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.tag.accent {
-    background: var(--accent-light);
-    color: var(--accent);
-}
-
-.muted {
-    color: var(--text-muted);
-    font-size: 13.5px;
-    margin: 4px 0;
-}
-
-/* Forms & Inputs */
-label {
-    display: block;
-    margin: 12px 0 6px;
-    font-size: 13.5px;
-    font-weight: 600;
-    color: var(--text);
-}
-
-input, select, textarea {
-    padding: 10px 14px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    background: white;
-    color: var(--text);
-    width: 100%;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-input:focus, select:focus, textarea:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(31, 122, 85, 0.15);
-}
-
-/* Exercise Library & Manual Cards */
-.exercise-toolbar {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-}
-
-.exercise-toolbar input {
-    flex: 2;
-    min-width: 220px;
-}
-
-.exercise-toolbar select {
-    flex: 1;
-    min-width: 140px;
-}
-
-.api-badge-bar {
-    background: var(--primary-light);
-    border: 1px solid var(--primary-border);
-    padding: 10px 16px;
-    border-radius: var(--radius-sm);
-    font-size: 13px;
-    margin-bottom: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-}
-
-.exercise-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 18px;
-}
-
-.exercise-card {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    box-shadow: var(--shadow-sm);
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
-}
-
-.exercise-card:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-md);
-}
-
-.exercise-card-media {
-    width: 100%;
-    height: 180px;
-    background: #f0f4f2;
-    overflow: hidden;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.exercise-card-media img,
-.exercise-card-media video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-}
-
-.exercise-card:hover .exercise-card-media img,
-.exercise-card:hover .exercise-card-media video {
-    transform: scale(1.04);
-}
-
-.video-pill {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: rgba(15, 23, 42, 0.78);
-    color: white;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 3px 8px;
-    border-radius: 999px;
-    backdrop-filter: blur(4px);
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    letter-spacing: 0.3px;
-    z-index: 2;
-}
-
-.trainer-tip-item {
-    display: flex;
-    gap: 8px;
-    align-items: flex-start;
-    margin-top: 6px;
-    font-size: 13.5px;
-    line-height: 1.45;
-}
-
-.exercise-card-body {
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-}
-
-.exercise-card-title {
-    font-size: 16px;
-    font-weight: 700;
-    text-transform: capitalize;
-    margin: 0 0 8px 0;
-    color: var(--text);
-}
-
-.exercise-card-tags {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    margin-bottom: 14px;
-}
-
-.exercise-card-actions {
-    margin-top: auto;
-    display: flex;
-    gap: 8px;
-}
-
-.exercise-card-actions button {
-    flex: 1;
-    font-size: 13px;
-    padding: 8px 12px;
-}
-
-/* Floating AI Assistant */
-.chat-toggle {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    border-radius: 999px;
-    padding: 12px 20px;
-    font-size: 14.5px;
-    font-weight: 700;
-    box-shadow: var(--shadow-lg);
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: linear-gradient(135deg, #1f7a55, #2f9469);
-    border: 2px solid rgba(255, 255, 255, 0.4);
-    animation: floatBounce 4s ease-in-out infinite;
-}
-
-@keyframes floatBounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
-}
-
-.chat-toggle .sparkle {
-    font-size: 18px;
-}
-
-.chat-panel {
-    position: fixed;
-    right: 24px;
-    bottom: 84px;
-    width: 400px;
-    height: 600px;
-    max-height: calc(100vh - 110px);
-    background: var(--surface);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    z-index: 1001;
-    animation: chatSlideUp 0.22s ease-out;
-}
-
-@keyframes chatSlideUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px) scale(0.96);
+const KEY = 'welllife-v1';
+const date = () => new Date().toLocaleDateString('en-CA');
+
+const initial = {
+    profile: { name: 'Friend', gender: 'custom', cycle: true },
+    water: {},
+    sleep: [],
+    workouts: [],
+    meals: [],
+    moods: {},
+    habits: [
+        { id: 1, name: 'Morning walk or stretch', days: [] },
+        { id: 2, name: 'Drink 8 glasses of water', days: [] },
+        { id: 3, name: 'Eat mindful fresh fruit or greens', days: [] }
+    ],
+    cycles: [],
+    goals: { water: 8, sleep: 8, exercise: 30 }
+};
+
+let db;
+try {
+    db = { ...structuredClone(initial), ...JSON.parse(localStorage.getItem(KEY) || '{}') };
+    // Ensure nested objects exist
+    if (!db.habits || !Array.isArray(db.habits)) db.habits = structuredClone(initial.habits);
+    if (!db.goals) db.goals = structuredClone(initial.goals);
+    if (!db.profile) db.profile = structuredClone(initial.profile);
+    if (db.profile.cycle === undefined) db.profile.cycle = true;
+    if (!db.cycles) db.cycles = [];
+} catch {
+    db = structuredClone(initial);
+}
+
+const save = () => localStorage.setItem(KEY, JSON.stringify(db));
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+
+const esc = s => String(s || '').replace(/[&<>"']/g, c => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+}[c]));
+
+const today = date();
+let page = 'Dashboard';
+let chartInstances = {};
+let currentExercises = [];
+let selectedExerciseForManual = null;
+let exerciseSearchTimeout = null;
+
+const menu = [
+    'Dashboard',
+    'Exercise',
+    'Water',
+    'Sleep',
+    'Nutrition',
+    'Mood',
+    'Habits',
+    'Cycle Tracker',
+    'Analytics'
+];
+
+// Helper card & meter builders
+const box = (title, body, cls = '') => `<article class="card ${cls}"><h3>${title}</h3>${body}</article>`;
+const meter = (n, d) => `<div class="bar"><i style="width:${Math.min(100, Math.max(0, (n / d) * 100 || 0))}%"></i></div>`;
+const button = (label, action, extra = '') => `<button ${extra} data-action="${action}">${label}</button>`;
+
+// Helper to retrieve WorkoutX API key from storage, HTML meta, or window config
+const getWorkoutXApiKey = () => {
+    return localStorage.getItem('welllife_workoutx_key') ||
+        (typeof window !== 'undefined' && window.WORKOUTX_API_KEY) ||
+        document.querySelector('meta[name="workoutx-api-key"]')?.content ||
+        'wx_78fbd0580bddd8e01e5ef360e6173b4ec564861bf41ebc658ef13d04';
+};
+if (typeof localStorage !== 'undefined' && !localStorage.getItem('welllife_workoutx_key')) {
+    localStorage.setItem('welllife_workoutx_key', 'wx_78fbd0580bddd8e01e5ef360e6173b4ec564861bf41ebc658ef13d04');
+}
+
+// Helper to safely fetch JSON from server without throwing on HTML 404 responses
+async function fetchSafeJson(url, options = {}) {
+    try {
+        const res = await fetch(url, options);
+        const contentType = res.headers.get('content-type') || '';
+        if (res.ok && contentType.includes('application/json')) {
+            return await res.json();
+        }
+    } catch (_) {}
+    return null;
+}
+
+// Calculate menstrual cycle count, phases, and historical statistics
+function getCycleStats() {
+    const cycles = Array.isArray(db.cycles) ? db.cycles : [];
+    if (cycles.length === 0) {
+        return {
+            hasData: false,
+            cycleDay: 0,
+            totalDays: 28,
+            daysUntilNext: 28,
+            isLate: false,
+            daysLate: 0,
+            nextPeriodDate: null,
+            phase: 'Not Tracked Yet',
+            phaseKey: 'none',
+            phaseColor: '#7c3aed',
+            phaseIcon: '🌸',
+            phaseDescription: 'Log your period start date below to calculate your cycle day count and active hormonal phase.',
+            phaseWorkoutTip: 'Track your cycle to receive workout recommendations tailored to your energy levels.',
+            phaseNutritionTip: 'Focus on balanced hydration, adequate protein, and micronutrient-rich whole foods.',
+            progressPercent: 0,
+            totalCycles: 0,
+            avgLength: 28,
+            avgDuration: 5,
+            latestCycle: null,
+            sortedCycles: []
+        };
     }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
+
+    // Sort ascending by start date
+    const sorted = [...cycles].sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+    const latest = sorted[sorted.length - 1];
+
+    const startDate = new Date(latest.start + 'T00:00:00');
+    const todayDate = new Date(today + 'T00:00:00');
+    const diffMs = todayDate.getTime() - startDate.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24)); // 0 on start date
+
+    const cycleLength = Math.max(15, Math.min(60, Number(latest.length) || 28));
+    const periodDuration = Math.max(1, Math.min(15, Number(latest.duration) || 5));
+
+    let cycleDay;
+    if (diffDays < 0) {
+        cycleDay = 1;
+    } else {
+        cycleDay = diffDays + 1; // 1-indexed, Day 1 is period start day
     }
-}
-
-.hidden {
-    display: none !important;
-}
-
-.chat-header {
-    background: linear-gradient(135deg, #1f7a55, #196345);
-    color: white;
-    padding: 16px 18px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.chat-header-info {
-    display: flex;
-    flex-direction: column;
-}
-
-.chat-header h3 {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.chat-header .badge-mistral {
-    font-size: 11px;
-    background: rgba(255, 255, 255, 0.2);
-    padding: 2px 8px;
-    border-radius: 999px;
-    letter-spacing: 0.3px;
-    font-weight: 600;
-    margin-top: 3px;
-    display: inline-block;
-}
-
-.chat-header-actions {
-    display: flex;
-    gap: 6px;
-}
-
-.chat-header-actions button {
-    background: rgba(255, 255, 255, 0.15);
-    color: white;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    display: grid;
-    place-items: center;
-    font-size: 14px;
-}
-
-.chat-header-actions button:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-.chat-suggestions {
-    display: flex;
-    gap: 6px;
-    padding: 10px 14px;
-    background: #f8faf8;
-    border-bottom: 1px solid var(--border);
-    overflow-x: auto;
-    white-space: nowrap;
-}
-
-.chat-chip {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    padding: 4px 11px;
-    font-size: 12px;
-    color: var(--text);
-    cursor: pointer;
-    flex-shrink: 0;
-    transition: all 0.15s ease;
-}
-
-.chat-chip:hover {
-    background: var(--primary-light);
-    color: var(--primary);
-    border-color: var(--primary);
-}
-
-.chat-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.bubble {
-    padding: 12px 16px;
-    border-radius: 16px;
-    max-width: 86%;
-    font-size: 14px;
-    line-height: 1.5;
-    word-break: break-word;
-}
-
-.bubble.bot {
-    background: #f0f6f2;
-    color: var(--text);
-    align-self: flex-start;
-    border-bottom-left-radius: 4px;
-    border: 1px solid #e1eee5;
-}
-
-.bubble.bot ul, .bubble.bot ol {
-    margin: 6px 0;
-    padding-left: 20px;
-}
-
-.bubble.user {
-    background: var(--primary);
-    color: white;
-    align-self: flex-end;
-    border-bottom-right-radius: 4px;
-}
-
-.bubble.typing {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 14px 18px;
-}
-
-.bubble.typing span {
-    width: 6px;
-    height: 6px;
-    background: var(--primary);
-    border-radius: 50%;
-    animation: typingBlink 1.4s infinite;
-}
-
-.bubble.typing span:nth-child(2) { animation-delay: 0.2s; }
-.bubble.typing span:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes typingBlink {
-    0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
-    40% { opacity: 1; transform: scale(1.1); }
-}
-
-.ai-consent-box {
-    padding: 8px 16px;
-    font-size: 12px;
-    color: var(--text-muted);
-    background: #fbfdfb;
-    border-top: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.ai-consent-box input[type="checkbox"] {
-    width: auto;
-    margin: 0;
-}
-
-.chat-form {
-    display: flex;
-    padding: 12px 14px;
-    gap: 8px;
-    border-top: 1px solid var(--border);
-    background: white;
-}
-
-.chat-form input {
-    flex: 1;
-    min-width: 0;
-    padding: 9px 14px;
-    border-radius: 999px;
-}
-
-.chat-form button {
-    border-radius: 999px;
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    display: grid;
-    place-items: center;
-    flex-shrink: 0;
-}
-
-/* Exercise Manual Modal Dialog */
-dialog {
-    border: none;
-    border-radius: var(--radius-lg);
-    padding: 0;
-    width: min(640px, 92vw);
-    box-shadow: var(--shadow-lg);
-    background: white;
-    overflow: hidden;
-}
-
-dialog::backdrop {
-    background: rgba(15, 30, 22, 0.55);
-    backdrop-filter: blur(3px);
-}
-
-.modal-header {
-    padding: 20px 24px;
-    background: white;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.modal-header h2 {
-    margin: 0;
-    font-size: 20px;
-    font-weight: 800;
-    text-transform: capitalize;
-}
-
-.modal-body {
-    padding: 24px;
-    max-height: 70vh;
-    overflow-y: auto;
-}
-
-.manual-media {
-    width: 100%;
-    max-height: 320px;
-    background: #f4f8f5;
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--border);
-}
-
-.manual-media img {
-    max-width: 100%;
-    max-height: 320px;
-    object-fit: contain;
-}
-
-.manual-badges {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 18px;
-}
-
-.instruction-step {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 12px;
-    align-items: flex-start;
-}
-
-.step-num {
-    background: var(--primary-light);
-    color: var(--primary);
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    display: grid;
-    place-items: center;
-    font-weight: 700;
-    font-size: 13px;
-    flex-shrink: 0;
-    margin-top: 2px;
-}
-
-.step-text {
-    flex: 1;
-    font-size: 14.5px;
-    line-height: 1.5;
-}
-
-.manual-tip {
-    background: #fff8e8;
-    border-left: 4px solid #f59e0b;
-    padding: 12px 16px;
-    border-radius: 6px;
-    font-size: 13.5px;
-    color: #92400e;
-    margin-top: 18px;
-}
-
-.modal-footer {
-    padding: 16px 24px;
-    border-top: 1px solid var(--border);
-    background: #fafcfa;
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-}
-
-/* Menstrual Cycle Tracker & Count Styles */
-.cycle-hero-card {
-    background: linear-gradient(135deg, #7c3aed 0%, #db2777 50%, #f43f5e 100%);
-    color: white;
-    padding: 28px 32px;
-    border-radius: var(--radius-lg);
-    box-shadow: 0 10px 28px rgba(124, 58, 237, 0.22);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 24px;
-    flex-wrap: wrap;
-}
-
-.cycle-hero-info {
-    flex: 1;
-    min-width: 240px;
-}
-
-.cycle-hero-info h2 {
-    margin: 6px 0 10px;
-    font-size: 26px;
-    font-weight: 800;
-}
-
-.cycle-hero-info p {
-    margin: 0;
-    opacity: 0.94;
-    font-size: 14.5px;
-    line-height: 1.5;
-}
-
-.cycle-day-box {
-    background: rgba(255, 255, 255, 0.18);
-    backdrop-filter: blur(8px);
-    border: 2px solid rgba(255, 255, 255, 0.4);
-    border-radius: var(--radius-md);
-    padding: 18px 24px;
-    text-align: center;
-    min-width: 170px;
-}
-
-.cycle-day-box .big-day {
-    font-size: 38px;
-    font-weight: 900;
-    line-height: 1;
-    letter-spacing: -0.5px;
-}
-
-.cycle-day-box .day-sub {
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 700;
-    opacity: 0.9;
-    margin-top: 4px;
-}
-
-.cycle-segmented-bar-wrapper {
-    position: relative;
-    margin: 24px 0 16px;
-}
-
-.cycle-segmented-bar {
-    height: 16px;
-    border-radius: 999px;
-    display: flex;
-    overflow: hidden;
-    background: #e2e8f0;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
-}
-
-.cycle-seg {
-    height: 100%;
-    position: relative;
-    transition: opacity 0.2s ease;
-}
-
-.cycle-seg.menstrual { background: #f43f5e; }
-.cycle-seg.follicular { background: #3b82f6; }
-.cycle-seg.ovulatory { background: #10b981; }
-.cycle-seg.luteal { background: #f59e0b; }
-
-.cycle-marker-cursor {
-    position: absolute;
-    top: -24px;
-    transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    pointer-events: none;
-    transition: left 0.3s ease;
-    z-index: 2;
-}
-
-.cycle-marker-pill {
-    background: #1e1b4b;
-    color: white;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 999px;
-    white-space: nowrap;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-}
-
-.cycle-marker-arrow {
-    width: 0;
-    height: 0;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 6px solid #1e1b4b;
-}
-
-.cycle-legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    font-size: 12.5px;
-    color: var(--text-muted);
-    margin-top: 10px;
-}
-
-.cycle-legend-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.cycle-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    display: inline-block;
-}
-
-.cycle-dot.menstrual { background: #f43f5e; }
-.cycle-dot.follicular { background: #3b82f6; }
-.cycle-dot.ovulatory { background: #10b981; }
-.cycle-dot.luteal { background: #f59e0b; }
-
-.cycle-guide-card {
-    background: #fdf4ff;
-    border: 1px solid #f0abfc;
-    border-radius: var(--radius-md);
-    padding: 20px 24px;
-    margin-top: 10px;
-}
-
-.cycle-guide-card h4 {
-    margin: 0 0 10px;
-    color: #86198f;
-    font-size: 16px;
-    font-weight: 800;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.cycle-guide-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 14px;
-    margin-top: 12px;
-}
-
-.cycle-guide-col {
-    background: rgba(255, 255, 255, 0.7);
-    padding: 12px 16px;
-    border-radius: var(--radius-sm);
-    border: 1px solid #fae8ff;
-}
-
-.cycle-guide-col b {
-    color: #701a75;
-    font-size: 13.5px;
-    display: block;
-    margin-bottom: 4px;
-}
-
-.cycle-guide-col p {
-    margin: 0;
-    font-size: 13px;
-    color: #4a044e;
-    line-height: 1.45;
-}
-
-.symptoms-selector {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin: 10px 0 16px;
-}
-
-.symptom-tag-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: #f8faf8;
-    border: 1px solid var(--border);
-    padding: 6px 12px;
-    border-radius: 999px;
-    font-size: 12.5px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    user-select: none;
-}
-
-.symptom-tag-label:hover {
-    border-color: #db2777;
-    background: #fdf2f8;
-}
-
-.symptom-tag-label input[type="checkbox"] {
-    width: auto;
-    margin: 0;
-    cursor: pointer;
-    accent-color: #db2777;
-}
-
-.symptom-tag-label:has(input:checked) {
-    background: #fce7f3;
-    border-color: #f472b6;
-    color: #9d174d;
-    font-weight: 600;
-}
-
-.cycle-history-item {
-    padding: 14px 0;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 14px;
-}
-
-.cycle-history-item:last-child {
-    border-bottom: none;
-}
-
-.cycle-history-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 6px;
-    flex-wrap: wrap;
-}
-
-.cycle-num-badge {
-    background: #ede9fe;
-    color: #6d28d9;
-    font-size: 11.5px;
-    font-weight: 800;
-    padding: 3px 8px;
-    border-radius: 999px;
-}
-
-.cycle-symptom-pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    margin-top: 6px;
-}
-
-.cycle-symptom-pill {
-    background: #fdf2f8;
-    color: #db2777;
-    border: 1px solid #fbcfe8;
-    font-size: 11px;
-    padding: 2px 7px;
-    border-radius: 999px;
-    font-weight: 600;
-}
 
-/* Responsive Media Queries */
-@media (max-width: 1080px) {
-    .grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+    const nextDate = new Date(startDate.getTime() + cycleLength * 86400000);
+    const daysUntilNext = Math.ceil((nextDate.getTime() - todayDate.getTime()) / (1000 * 60 * 60 * 24));
+    const isLate = daysUntilNext < 0;
+    const daysLate = isLate ? Math.abs(daysUntilNext) : 0;
+
+    // Phase determination (based on standard physiological cycles)
+    const ovulationDay = Math.max(periodDuration + 2, cycleLength - 14);
+
+    let phase = 'Follicular Phase';
+    let phaseKey = 'follicular';
+    let phaseColor = '#3b82f6';
+    let phaseIcon = '🌱';
+    let phaseDescription = 'Estrogen is steadily rising as ovarian follicles develop. Your physical energy, endurance, and insulin sensitivity are building up.';
+    let phaseWorkoutTip = 'Prime time for progressive overload: increase training volume, focus on compound barbell & dumbbell lifts, and push your strength capacity.';
+    let phaseNutritionTip = 'Your body utilizes carbohydrates efficiently now. Prioritize complex grains (oats, quinoa), lean proteins, and colorful vegetables.';
+
+    if (cycleDay <= periodDuration) {
+        phase = 'Menstrual Phase';
+        phaseKey = 'menstrual';
+        phaseColor = '#f43f5e';
+        phaseIcon = '🩸';
+        phaseDescription = 'Hormone levels (estrogen & progesterone) are at their lowest baseline while the uterine lining sheds. Recovery capacity may be reduced.';
+        phaseWorkoutTip = 'Opt for restorative movement: gentle walking, light stretching, mobility drills, and mat yoga. Avoid pushing through acute fatigue or cramps.';
+        phaseNutritionTip = 'Replenish iron losses with lentils, dark leafy greens, beans, and vitamin C. Drink warm herbal teas and maintain abundant hydration.';
+    } else if (cycleDay < ovulationDay) {
+        phase = 'Follicular Phase';
+        phaseKey = 'follicular';
+        phaseColor = '#3b82f6';
+        phaseIcon = '🌱';
+        phaseDescription = 'Estrogen is rising steadily. You will typically experience higher mental alertness, motivation, and muscular stamina.';
+        phaseWorkoutTip = 'Great training window: aim for heavier weights, test personal bests, and incorporate challenging resistance workouts.';
+        phaseNutritionTip = 'Support muscle repair with high-quality lean protein, fermented foods for gut health, and clean complex carbohydrates.';
+    } else if (cycleDay <= ovulationDay + 2) {
+        phase = 'Ovulatory Phase';
+        phaseKey = 'ovulatory';
+        phaseColor = '#10b981';
+        phaseIcon = '🌟';
+        phaseDescription = 'Luteinizing hormone surges and an egg is released. Testosterone and estrogen peak, conferring high power output and confidence.';
+        phaseWorkoutTip = 'Peak power output window! High-intensity interval training (HIIT), fast-paced circuits, sprints, and maximum effort sets shine here.';
+        phaseNutritionTip = 'Incorporate cruciferous vegetables (broccoli, cauliflower) and plenty of dietary fiber to assist natural estrogen processing.';
+    } else if (cycleDay <= cycleLength) {
+        phase = 'Luteal Phase';
+        phaseKey = 'luteal';
+        phaseColor = '#f59e0b';
+        phaseIcon = '🍂';
+        phaseDescription = 'Progesterone dominates to prepare the body. Core body temperature is slightly higher and resting metabolic rate increases by 100-300 kcal.';
+        phaseWorkoutTip = 'Gradually dial back intensity toward moderate resistance training, Pilates, and steady-state cardio. Allow extra recovery between sets.';
+        phaseNutritionTip = 'Cravings may rise due to higher energy burn. Satisfy hunger with magnesium-rich foods (pumpkin seeds, dark chocolate), healthy fats, and fiber.';
+    } else {
+        phase = 'Extended Cycle';
+        phaseKey = 'extended';
+        phaseColor = '#8b5cf6';
+        phaseIcon = '⏳';
+        phaseDescription = `You are on Day ${cycleDay}, which is ${daysLate} day(s) past your typical ${cycleLength}-day cycle length.`;
+        phaseWorkoutTip = 'Prioritize gentle walking, stress management, breathwork, and deep sleep. Natural variations or stress frequently shift cycle timing.';
+        phaseNutritionTip = 'Keep cortisol in check with warm herbal teas, magnesium, and balanced, nourishing meals without skipping nutrition.';
+    }
+
+    const progressPercent = Math.min(100, Math.max(0, Math.round((Math.min(cycleDay, cycleLength) / cycleLength) * 100)));
+
+    const avgLength = (sorted.reduce((acc, c) => acc + (Number(c.length) || 28), 0) / sorted.length).toFixed(1);
+    const avgDuration = (sorted.reduce((acc, c) => acc + (Number(c.duration) || 5), 0) / sorted.length).toFixed(1);
+
+    return {
+        hasData: true,
+        cycleDay,
+        totalDays: cycleLength,
+        daysUntilNext,
+        isLate,
+        daysLate,
+        nextPeriodDate: nextDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }),
+        phase,
+        phaseKey,
+        phaseColor,
+        phaseIcon,
+        phaseDescription,
+        phaseWorkoutTip,
+        phaseNutritionTip,
+        progressPercent,
+        periodDuration,
+        ovulationDay,
+        totalCycles: sorted.length,
+        avgLength: parseFloat(avgLength),
+        avgDuration: parseFloat(avgDuration),
+        latestCycle: latest,
+        sortedCycles: sorted
+    };
+}
+
+// Nav Bar
+function nav() {
+    $('#nav').innerHTML = menu
+        .filter(x => x !== 'Cycle Tracker' || db.profile.cycle !== false)
+        .map(x => {
+            const icons = {
+                Dashboard: '◫',
+                Exercise: '🏋️',
+                Water: '💧',
+                Sleep: '☾',
+                Nutrition: '🍎',
+                Mood: '☺',
+                Habits: '✓',
+                'Cycle Tracker': '🌸',
+                Analytics: '▥'
+            };
+            return `<button class="${page === x ? 'active' : ''}" data-page="${x}">
+                <span>${icons[x] || '•'}</span> &nbsp;${x}
+            </button>`;
+        }).join('');
+}
+
+// Computations
+const water = () => db.water[today] || 0;
+const sleepToday = () => db.sleep.filter(x => x.date === today).at(-1)?.hours || 0;
+const minutesToday = () => db.workouts.filter(x => x.date === today).reduce((a, x) => a + Number(x.minutes || 0), 0);
+const completed = () => db.habits.filter(x => x.days.includes(today)).length;
+const score = () => {
+    const wScore = Math.min(1, water() / (db.goals.water || 8));
+    const sScore = Math.min(1, sleepToday() / (db.goals.sleep || 8));
+    const eScore = Math.min(1, minutesToday() / (db.goals.exercise || 30));
+    const hScore = db.habits.length ? completed() / db.habits.length : 0;
+    return Math.round((wScore + sScore + eScore + hScore) * 25);
+};
+
+// ----------------- Page Renderers -----------------
+
+// 1. Dashboard
+function dashboard() {
+    const cycleStats = getCycleStats();
+
+    return `
+    <div class="hero">
+        <div>
+            <div class="eyebrow" style="color: #d1fae5">WELCOME BACK, ${esc(db.profile.name.toUpperCase())}</div>
+            <h2>Make today a little healthier 🌿</h2>
+            <p>Every small step builds momentum. Let's make today count.</p>
+        </div>
+        <div class="score-circle">${score()}%</div>
+    </div>
+    
+    <div class="grid">
+        ${[
+            ['💧', 'Water', `${water()} / ${db.goals.water} glasses`, water(), db.goals.water],
+            ['☾', 'Sleep', `${sleepToday()} / ${db.goals.sleep} hours`, sleepToday(), db.goals.sleep],
+            ['🏃', 'Activity', `${minutesToday()} / ${db.goals.exercise} min`, minutesToday(), db.goals.exercise],
+            ['✓', 'Habits', `${completed()} / ${db.habits.length} done`, completed(), db.habits.length || 1]
+        ].map(([i, t, v, n, d]) => `
+            <div class="card metric">
+                <div class="icon">${i}</div>
+                <p class="muted">${t}</p>
+                <h2>${v}</h2>
+                ${meter(n, d)}
+            </div>
+        `).join('')}
+
+        <!-- Menstrual Cycle Count Card on Dashboard -->
+        ${db.profile.cycle !== false ? `
+            <div class="card full" style="border-left: 4px solid ${cycleStats.hasData ? cycleStats.phaseColor : '#7c3aed'};">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
+                    <div>
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                            <span class="tag" style="background:${cycleStats.hasData ? cycleStats.phaseColor + '20' : '#ede9fe'};color:${cycleStats.hasData ? cycleStats.phaseColor : '#6d28d9'};font-weight:700;">
+                                ${cycleStats.phaseIcon} ${cycleStats.phase}
+                            </span>
+                            ${cycleStats.hasData ? `
+                                <span class="muted">
+                                    ${cycleStats.isLate ? `⚠️ ${cycleStats.daysLate} day(s) late` : `⏳ Next period in ${cycleStats.daysUntilNext} days (${cycleStats.nextPeriodDate})`}
+                                </span>
+                            ` : ''}
+                        </div>
+                        <h2 style="margin:4px 0 6px;font-size:22px;font-weight:800;">
+                            ${cycleStats.hasData ? `Day ${cycleStats.cycleDay} of ${cycleStats.totalDays} · Menstrual Cycle Count` : 'Menstrual Cycle Tracker'}
+                        </h2>
+                        <p class="muted" style="margin:0;">
+                            ${cycleStats.hasData ? cycleStats.phaseDescription : 'Track your cycle day count, menstrual rhythm, and phase-tailored workout recommendations.'}
+                        </p>
+                    </div>
+                    <div class="row">
+                        ${button('🌸 View Cycle Tracker', 'goCycle')}
+                        ${cycleStats.hasData ? button('✨ Ask AI Phase Advice', 'cycleAI', 'class="secondary"') : ''}
+                    </div>
+                </div>
+                ${cycleStats.hasData ? `
+                    <div class="bar" style="margin-top:14px;height:10px;">
+                        <i style="width:${cycleStats.progressPercent}%;background:${cycleStats.phaseColor};"></i>
+                    </div>
+                ` : ''}
+            </div>
+        ` : ''}
+
+        ${box('Today’s habits', habitRows(), 'wide')}
+
+        ${box('Quick actions', `
+            <p class="muted">Log your daily progress easily:</p>
+            <div class="row">
+                ${button('💧 + Water', 'addWater')}
+                ${button('🏋️ Browse Exercises', 'goExercise', 'class="secondary"')}
+                ${button('🌸 Track Cycle', 'goCycle', 'class="secondary"')}
+                ${button('☾ Log sleep', 'goSleep', 'class="secondary"')}
+            </div>
+        `, 'wide')}
+
+        ${box('Workout Library & Mistral AI Support', `
+            <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;justify-content:space-between">
+                <div>
+                    <b>⚡ WorkoutX API:</b> Access 2,760+ animated HD video exercises & manuals.<br>
+                    <b>✨ Mistral AI:</b> Ask form tips, habit analysis, and meal ideas in the floating assistant.
+                </div>
+                <div class="row">
+                    ${button('Open AI Assistant', 'openAssistant', 'class="secondary"')}
+                </div>
+            </div>
+        `, 'full')}
+    </div>`;
+}
+
+function habitRows() {
+    return db.habits.map(h => `
+        <div class="item">
+            <label style="margin:0;cursor:pointer;display:flex;align-items:center;gap:8px;">
+                <input type="checkbox" data-habit="${h.id}" ${h.days.includes(today) ? 'checked' : ''} style="width:auto;margin:0;">
+                ${esc(h.name)}
+            </label>
+            <span class="tag ${h.days.includes(today) ? '' : 'accent'}">
+                ${h.days.includes(today) ? '✓ Done' : 'Pending'}
+            </span>
+        </div>
+    `).join('') || '<p class="muted">No habits added yet. Go to Habits page to create one.</p>';
+}
+
+// 2. Exercise & Workout Manual Page
+function exercisePage() {
+    return `
+    <div class="grid">
+        <div class="card full">
+            <h3>
+                <span>🏋️ WorkoutX & Exercise Manual Library</span>
+                <span class="tag" id="exerciseSourceTag">Loading catalog...</span>
+            </h3>
+
+            <div class="exercise-toolbar">
+                <input id="exerciseSearch" placeholder="Search exercises, muscles (e.g. bench press, squat, lats, abs)...">
+                <select id="bodyPartFilter">
+                    <option value="all">All Body Parts</option>
+                    <option value="chest">Chest</option>
+                    <option value="back">Back</option>
+                    <option value="shoulders">Shoulders</option>
+                    <option value="upper arms">Upper Arms (Biceps/Triceps)</option>
+                    <option value="upper legs">Upper Legs (Quads/Hamstrings)</option>
+                    <option value="waist">Waist & Core</option>
+                    <option value="cardio">Cardio</option>
+                    <option value="lower legs">Lower Legs (Calves)</option>
+                    <option value="lower arms">Lower Arms (Forearms)</option>
+                </select>
+                <select id="equipmentFilter">
+                    <option value="all">All Equipment</option>
+                    <option value="barbell">Barbell</option>
+                    <option value="dumbbell">Dumbbell</option>
+                    <option value="cable">Cable</option>
+                    <option value="body weight">Body Weight</option>
+                    <option value="leverage machine">Machine</option>
+                    <option value="kettlebell">Kettlebell</option>
+                    <option value="rope">Rope</option>
+                </select>
+            </div>
+
+            <div id="exerciseGrid" class="exercise-grid">
+                <div class="item" style="grid-column: 1 / -1; justify-content: center; padding: 40px 0;">
+                    <span class="muted">Loading live exercises from WorkoutX & Exercise library...</span>
+                </div>
+            </div>
+        </div>
+
+        ${box('Log Workout', `
+            <div class="row">
+                <label style="flex:2;min-width:180px;">
+                    Exercise
+                    <input id="workoutExerciseInput" list="exerciseDatalist" placeholder="e.g. Barbell Bench Press" required>
+                    <datalist id="exerciseDatalist"></datalist>
+                </label>
+                <label style="flex:1;min-width:90px;">
+                    Minutes
+                    <input id="workoutMinutes" type="number" min="1" value="30">
+                </label>
+                <label style="flex:1;min-width:90px;">
+                    Sets
+                    <input id="workoutSets" type="number" min="1" value="3">
+                </label>
+                <label style="flex:1;min-width:90px;">
+                    Reps
+                    <input id="workoutReps" type="number" min="1" value="10">
+                </label>
+                <label style="flex:1;min-width:90px;">
+                    Weight (kg)
+                    <input id="workoutWeight" type="number" min="0" step="0.5" value="0">
+                </label>
+            </div>
+            <div style="margin-top:14px;">
+                ${button('Save Workout Log', 'saveWorkout')}
+            </div>
+        `, 'wide')}
+
+        ${box('Recent Workouts', `
+            <div id="recentWorkoutsList">
+                ${db.workouts.slice(-8).reverse().map(x => `
+                    <div class="item">
+                        <div>
+                            <b>${esc(x.name)}</b>
+                            <p class="muted">${esc(x.date)} · ${x.sets} sets × ${x.reps} reps · ${x.weight} kg</p>
+                        </div>
+                        <span class="tag">${x.minutes} min</span>
+                    </div>
+                `).join('') || '<p class="muted">No workouts logged yet. Pick an exercise above to log your session.</p>'}
+            </div>
+        `, 'wide')}
+    </div>`;
+}
+
+// Fetch and draw exercises (supports Local Node Server + GitHub Pages static direct API + Built-in Fallback)
+async function loadExercises() {
+    const grid = $('#exerciseGrid');
+    if (!grid) return;
+
+    const search = ($('#exerciseSearch')?.value || '').trim();
+    const bodyPart = $('#bodyPartFilter')?.value || 'all';
+    const equipment = $('#equipmentFilter')?.value || 'all';
+
+    const clientWxKey = getWorkoutXApiKey();
+
+    try {
+        let data = null;
+
+        // Tier 1: Try local server API if running on localhost / 127.0.0.1
+        const isLocalHost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+        if (isLocalHost) {
+            const queryParams = new URLSearchParams();
+            if (search) queryParams.set('search', search);
+            if (bodyPart !== 'all') queryParams.set('bodyPart', bodyPart);
+            if (equipment !== 'all') queryParams.set('equipment', equipment);
+            queryParams.set('limit', '30');
+
+            const headers = {};
+            if (clientWxKey) headers['X-WorkoutX-Key'] = clientWxKey;
+
+            data = await fetchSafeJson(`/api/exercises?${queryParams.toString()}`, { headers });
+        }
+
+        // Tier 2: Direct browser call to WorkoutX API (works on GitHub Pages / static hosting via CORS)
+        if (!data || !data.exercises || data.exercises.length === 0) {
+            const wxKey = clientWxKey || 'wx_78fbd0580bddd8e01e5ef360e6173b4ec564861bf41ebc658ef13d04';
+            if (wxKey) {
+                try {
+                    const wxUrl = new URL('https://api.workoutxapp.com/v2/exercises');
+                    wxUrl.searchParams.set('limit', '30');
+                    if (search) wxUrl.searchParams.set('name', search);
+                    if (bodyPart !== 'all') wxUrl.searchParams.set('bodyPart', bodyPart);
+                    if (equipment !== 'all') wxUrl.searchParams.set('equipment', equipment);
+
+                    const wxData = await fetchSafeJson(wxUrl.toString(), {
+                        headers: {
+                            'X-WorkoutX-Key': wxKey,
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    if (wxData && Array.isArray(wxData.results) && wxData.results.length > 0) {
+                        const transformer = window.transformWorkoutXExercise || (typeof transformWorkoutXExercise === 'function' ? transformWorkoutXExercise : (x => x));
+                        data = {
+                            source: 'workoutx',
+                            total: wxData.total || wxData.results.length,
+                            count: wxData.results.length,
+                            exercises: wxData.results.map(transformer)
+                        };
+                    }
+                } catch (wxErr) {
+                    console.warn('Direct WorkoutX API call failed, falling back:', wxErr);
+                }
+            }
+        }
+
+        // Tier 3: Built-in exercises fallback (zero network required, works offline)
+        if (!data || !data.exercises || data.exercises.length === 0) {
+            const filterFn = window.filterBuiltinExercises || (typeof filterBuiltinExercises === 'function' ? filterBuiltinExercises : null);
+            if (filterFn) {
+                const builtin = filterFn({ search, bodyPart, equipment, limit: 30, offset: 0 });
+                data = {
+                    source: 'builtin',
+                    total: builtin.total,
+                    count: builtin.exercises.length,
+                    exercises: builtin.exercises
+                };
+            }
+        }
+
+        currentExercises = (data && data.exercises) || [];
+
+        // Update tag
+        const tag = $('#exerciseSourceTag');
+        if (tag) {
+            if (data && data.source === 'workoutx') {
+                tag.textContent = `⚡ WorkoutX Live (${data.total || data.count} Exercises)`;
+                tag.className = 'tag';
+                tag.style.background = '#e0f2fe';
+                tag.style.color = '#0284c7';
+            } else {
+                tag.textContent = `Built-in Manual (${currentExercises.length} items)`;
+                tag.className = 'tag accent';
+                tag.style.background = '';
+                tag.style.color = '';
+            }
+        }
+
+        // Update datalist for quick logging
+        const datalist = $('#exerciseDatalist');
+        if (datalist) {
+            datalist.innerHTML = currentExercises.map(x => `<option value="${esc(x.name)}"></option>`).join('');
+        }
+
+        if (currentExercises.length === 0) {
+            grid.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px;" class="muted">
+                    No exercises found matching "<b>${esc(search)}</b>". Try different keywords or reset filters.
+                </div>
+            `;
+            return;
+        }
+
+        grid.innerHTML = currentExercises.map(ex => {
+            const fallbackImg = 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=500&auto=format&fit=crop&q=80';
+            const imgUrl = ex.poster || ex.gifUrl || fallbackImg;
+            const hasVideo = Boolean(ex.videoUrl);
+
+            return `
+                <div class="exercise-card">
+                    <div class="exercise-card-media">
+                        ${hasVideo ? `<span class="video-pill">▶ HD Loop</span>` : ''}
+                        ${hasVideo ? `
+                            <video autoplay loop muted playsinline poster="${esc(imgUrl)}" src="${esc(ex.videoUrl)}"></video>
+                        ` : `
+                            <img src="${esc(imgUrl)}" alt="${esc(ex.name)}" onerror="this.src='${fallbackImg}'">
+                        `}
+                    </div>
+                    <div class="exercise-card-body">
+                        <h4 class="exercise-card-title">${esc(ex.name)}</h4>
+                        <div class="exercise-card-tags">
+                            <span class="tag">${esc(ex.bodyPart || 'Body')}</span>
+                            <span class="tag accent">${esc(ex.target || 'Target')}</span>
+                            <span class="tag" style="background:#eef2ff;color:#4f46e5">${esc(ex.equipment || 'Equipment')}</span>
+                            ${ex.difficulty ? `<span class="tag" style="background:#fef3c7;color:#b45309;text-transform:capitalize;">${esc(ex.difficulty)}</span>` : ''}
+                        </div>
+                        <div class="exercise-card-actions">
+                            <button class="secondary" data-action="viewManual" data-id="${esc(ex.id || ex.name)}">
+                                📖 View Manual
+                            </button>
+                            <button data-action="selectExercise" data-name="${esc(ex.name)}">
+                                + Log
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+    } catch (err) {
+        console.error('Error fetching exercises:', err);
+        grid.innerHTML = `
+            <div style="grid-column: 1 / -1; padding: 24px; background:#fff2f0; color:#b71c1c; border-radius:12px;">
+                <b>Could not load exercises:</b> ${esc(err.message)}
+            </div>
+        `;
     }
 }
 
-@media (max-width: 768px) {
-    .app {
-        flex-direction: column;
+// Open Exercise Manual Modal
+function openExerciseManual(exerciseIdOrName) {
+    const ex = currentExercises.find(x => x.id === exerciseIdOrName || x.name.toLowerCase() === String(exerciseIdOrName).toLowerCase());
+    if (!ex) return;
+
+    selectedExerciseForManual = ex;
+
+    $('#manualTitle').textContent = ex.name;
+    const fallbackImg = 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop&q=80';
+    const videoEl = $('#manualVideo');
+    const imgEl = $('#manualGif');
+
+    if (ex.videoUrl && videoEl) {
+        videoEl.src = ex.videoUrl;
+        videoEl.poster = ex.poster || ex.gifUrl || fallbackImg;
+        videoEl.style.display = 'block';
+        videoEl.play().catch(() => {});
+        if (imgEl) imgEl.style.display = 'none';
+    } else {
+        if (videoEl) {
+            videoEl.pause();
+            videoEl.style.display = 'none';
+        }
+        if (imgEl) {
+            imgEl.src = ex.gifUrl || ex.poster || fallbackImg;
+            imgEl.onerror = () => { imgEl.src = fallbackImg; };
+            imgEl.style.display = 'block';
+        }
     }
 
-    .sidebar {
-        width: 100%;
-        padding: 16px;
-        border-right: none;
-        border-bottom: 1px solid var(--border);
+    // Badges
+    const badgesHtml = `
+        <span class="tag"><b>Part:</b> &nbsp;${esc(ex.bodyPart)}</span>
+        <span class="tag accent"><b>Target:</b> &nbsp;${esc(ex.target)}</span>
+        <span class="tag" style="background:#eef2ff;color:#4f46e5"><b>Equipment:</b> &nbsp;${esc(ex.equipment)}</span>
+        ${ex.difficulty ? `<span class="tag" style="background:#fef3c7;color:#b45309;text-transform:capitalize;"><b>Level:</b> &nbsp;${esc(ex.difficulty)}</span>` : ''}
+        ${ex.recommendedSets ? `<span class="tag" style="background:#ede9fe;color:#6d28d9;"><b>Sets/Reps:</b> &nbsp;${esc(ex.recommendedSets)} × ${esc(ex.recommendedReps || '10-15')}</span>` : ''}
+        ${ex.caloriesPerMinute ? `<span class="tag" style="background:#fee2e2;color:#b91c1c;">🔥 ${esc(ex.caloriesPerMinute)} kcal/min</span>` : ''}
+        ${ex.secondaryMuscles?.length ? `<span class="tag" style="background:#f3f4f6;color:#374151"><b>Secondary:</b> &nbsp;${ex.secondaryMuscles.join(', ')}</span>` : ''}
+    `;
+    $('#manualBadges').innerHTML = badgesHtml;
+
+    // Instructions
+    const instructions = Array.isArray(ex.instructions)
+        ? ex.instructions
+        : (typeof ex.instructions === 'string' ? ex.instructions.split('\n').filter(Boolean) : [
+            'Assume the starting position with proper alignment and balance.',
+            'Execute the movement with controlled tempo through the full range of motion.',
+            'Exhale on the concentric (exertion) phase and inhale on the return phase.',
+            'Repeat for target repetitions without bouncing or using momentum.'
+        ]);
+
+    $('#manualInstructions').innerHTML = instructions.map((step, idx) => `
+        <div class="instruction-step">
+            <span class="step-num">${idx + 1}</span>
+            <span class="step-text">${esc(step)}</span>
+        </div>
+    `).join('');
+
+    // Form tips / cues
+    const formCueEl = $('#manualFormCue');
+    if (formCueEl) {
+        if (ex.tips && ex.tips.length > 0) {
+            formCueEl.innerHTML = ex.tips.map(tip => `
+                <div class="trainer-tip-item">
+                    <span>✓</span>
+                    <span>${esc(tip)}</span>
+                </div>
+            `).join('');
+        } else {
+            formCueEl.textContent = 'Keep core braced, maintain steady rhythmic breathing, and never compromise technique for heavier weights.';
+        }
     }
 
-    .brand-sub, .sidefoot {
-        display: none;
+    $('#exerciseManualDialog').showModal();
+}
+
+// 3. Water Page
+function waterPage() {
+    return `
+    <div class="grid">
+        ${box('Daily Hydration Tracker', `
+            <h2>${water()} / ${db.goals.water} glasses</h2>
+            ${meter(water(), db.goals.water)}
+            <p class="muted">Staying well hydrated promotes physical endurance, mental clarity, and digestion.</p>
+            <div class="row" style="margin-top:16px;">
+                ${button('💧 + Add Glass', 'addWater')}
+                ${button('− Remove Glass', 'removeWater', 'class="secondary"')}
+            </div>
+        `, 'wide')}
+
+        ${box('Set Hydration Goal', `
+            <label>
+                Daily target glasses (250ml each)
+                <input id="waterGoal" type="number" min="1" max="40" value="${db.goals.water}">
+            </label>
+            ${button('Save Hydration Goal', 'saveWaterGoal')}
+        `, 'wide')}
+    </div>`;
+}
+
+// 4. Sleep Page
+function sleepPage() {
+    return `
+    <div class="grid">
+        ${box('Log Sleep Session', `
+            <label>Sleep date <input id="sleepDate" type="date" value="${today}"></label>
+            <div class="row">
+                <label style="flex:1;">Bedtime <input id="bed" type="time" value="23:00"></label>
+                <label style="flex:1;">Wake time <input id="wake" type="time" value="07:00"></label>
+            </div>
+            <p class="muted">Overnight sleep duration is calculated automatically.</p>
+            <div style="margin-top:14px;">
+                ${button('Save Sleep Log', 'saveSleep')}
+            </div>
+        `, 'wide')}
+
+        ${box('Sleep History', `
+            ${db.sleep.slice(-8).reverse().map(x => `
+                <div class="item">
+                    <span>${esc(x.date)}</span>
+                    <b>${x.hours} hours</b>
+                </div>
+            `).join('') || '<p class="muted">No sleep records logged yet.</p>'}
+        `, 'wide')}
+    </div>`;
+}
+
+// 5. Nutrition Page
+function nutritionPage() {
+    return `
+    <div class="grid">
+        ${box('Meal Journal', `
+            <label>Meal Type
+                <select id="mealType">
+                    <option>Breakfast</option>
+                    <option>Lunch</option>
+                    <option>Dinner</option>
+                    <option>Snack</option>
+                </select>
+            </label>
+            <label>What did you eat or drink?
+                <input id="mealText" maxlength="180" placeholder="e.g. Oatmeal with blueberries, Greek yogurt, almonds">
+            </label>
+            <div style="margin-top:14px;">
+                ${button('Add Meal Log', 'saveMeal')}
+            </div>
+        `, 'wide')}
+
+        ${box('Recent Meals', `
+            ${db.meals.slice(-10).reverse().map(x => `
+                <div class="item">
+                    <div>
+                        <b>${esc(x.type)}</b>
+                        <p class="muted">${esc(x.text)}</p>
+                    </div>
+                    <span class="tag">${esc(x.date)}</span>
+                </div>
+            `).join('') || '<p class="muted">No meals logged yet today.</p>'}
+        `, 'wide')}
+    </div>`;
+}
+
+// 6. Mood Page
+function moodPage() {
+    const moods = ['😄 Great', '😊 Good', '😐 Okay', '😔 Low', '😣 Stressed'];
+    const currentMood = db.moods[today] !== undefined ? moods[db.moods[today]] : 'Not logged yet';
+
+    return `
+    <div class="grid">
+        ${box('How are you feeling today?', `
+            <div class="row" style="margin-bottom:16px;">
+                ${['😄', '😊', '😐', '😔', '😣'].map((e, i) => `
+                    <button class="pill secondary" style="font-size:22px;padding:8px 16px;" data-action="mood" data-mood="${i}">
+                        ${e}
+                    </button>
+                `).join('')}
+            </div>
+            <p>Today's mood status: <b>${currentMood}</b></p>
+        `, 'wide')}
+
+        ${box('Recent Mood Log', `
+            ${Object.entries(db.moods).slice(-10).reverse().map(([d, i]) => `
+                <div class="item">
+                    <span>${esc(d)}</span>
+                    <b>${moods[i] || 'Logged'}</b>
+                </div>
+            `).join('') || '<p class="muted">No mood history logged yet.</p>'}
+        `, 'wide')}
+    </div>`;
+}
+
+// 7. Habits Page
+function habitsPage() {
+    return `
+    <div class="grid">
+        ${box('My Daily Habits', habitRows(), 'wide')}
+
+        ${box('Create a New Habit', `
+            <label>Habit Name
+                <input id="habitName" maxlength="65" placeholder="e.g. 10 minutes foam rolling or mobility">
+            </label>
+            <div style="margin-top:14px;">
+                ${button('+ Add Habit', 'addHabit')}
+            </div>
+            <p class="muted" style="margin-top:12px;">Habit streaks are tracked privately in your local browser storage.</p>
+        `, 'wide')}
+    </div>`;
+}
+
+// 8. Cycle Tracker Page
+function cyclePage() {
+    const stats = getCycleStats();
+
+    // Segment widths for 4 phases
+    const L = stats.totalDays;
+    const dur = stats.periodDuration;
+    const ov = stats.ovulationDay;
+    const menstrualPct = Math.round((dur / L) * 100);
+    const follicularPct = Math.max(5, Math.round(((ov - dur - 1) / L) * 100));
+    const ovulatoryPct = Math.max(5, Math.round((3 / L) * 100));
+    const lutealPct = Math.max(5, 100 - (menstrualPct + follicularPct + ovulatoryPct));
+
+    const cursorPct = stats.hasData
+        ? Math.min(97, Math.max(3, (stats.cycleDay / L) * 100))
+        : 0;
+
+    return `
+    <div class="grid">
+        <!-- Hero Card with Big Cycle Count -->
+        <div class="card full" style="padding:0;overflow:hidden;border:none;">
+            <div class="cycle-hero-card">
+                <div class="cycle-hero-info">
+                    <span class="eyebrow" style="color:#fbcfe8;">MENSTRUAL CYCLE TRACKER & COUNT</span>
+                    <h2>${stats.hasData ? `${stats.phaseIcon} Day ${stats.cycleDay} of ${stats.totalDays}` : 'Track Your Menstrual Cycle 🌸'}</h2>
+                    <p>
+                        ${stats.hasData
+                            ? `You are currently in the <b>${stats.phase}</b>. ${stats.isLate ? `Your cycle is <b>${stats.daysLate} day(s) past expected duration</b>.` : `Next period estimated in <b>${stats.daysUntilNext} days</b> (${stats.nextPeriodDate}).`}`
+                            : 'Log your period start date below to calculate your current cycle day count, monitor phases, and get personalized workout coaching.'}
+                    </p>
+                </div>
+                <div class="cycle-day-box">
+                    <div class="big-day">${stats.hasData ? `Day ${stats.cycleDay}` : '—'}</div>
+                    <div class="day-sub">${stats.hasData ? `of ${stats.totalDays} Days` : 'Not Logged'}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Segmented Cycle Phase Progress Bar -->
+        ${stats.hasData ? `
+            <div class="card full">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                    <h3 style="margin:0;">Cycle Phase Journey</h3>
+                    <span class="tag" style="background:${stats.phaseColor}20;color:${stats.phaseColor};font-weight:700;">
+                        ${stats.phaseIcon} Current: ${stats.phase} (Day ${stats.cycleDay})
+                    </span>
+                </div>
+
+                <div class="cycle-segmented-bar-wrapper">
+                    <div class="cycle-marker-cursor" style="left:${cursorPct}%;">
+                        <span class="cycle-marker-pill">Today · Day ${stats.cycleDay}</span>
+                        <div class="cycle-marker-arrow"></div>
+                    </div>
+                    <div class="cycle-segmented-bar">
+                        <div class="cycle-seg menstrual" style="width:${menstrualPct}%;" title="Menstrual Phase: Days 1-${dur}"></div>
+                        <div class="cycle-seg follicular" style="width:${follicularPct}%;" title="Follicular Phase: Days ${dur + 1}-${ov - 1}"></div>
+                        <div class="cycle-seg ovulatory" style="width:${ovulatoryPct}%;" title="Ovulatory Window: Days ${ov}-${ov + 2}"></div>
+                        <div class="cycle-seg luteal" style="width:${lutealPct}%;" title="Luteal Phase: Days ${ov + 3}-${L}"></div>
+                    </div>
+                </div>
+
+                <div class="cycle-legend">
+                    <span class="cycle-legend-item"><i class="cycle-dot menstrual"></i> <b>Menstrual:</b> Days 1–${dur}</span>
+                    <span class="cycle-legend-item"><i class="cycle-dot follicular"></i> <b>Follicular:</b> Days ${dur + 1}–${ov - 1}</span>
+                    <span class="cycle-legend-item"><i class="cycle-dot ovulatory"></i> <b>Ovulatory:</b> Days ${ov}–${ov + 2}</span>
+                    <span class="cycle-legend-item"><i class="cycle-dot luteal"></i> <b>Luteal:</b> Days ${ov + 3}–${L}</span>
+                </div>
+            </div>
+        ` : ''}
+
+        <!-- 4 Cycle Count Metric Cards -->
+        ${[
+            ['🔢', 'Current Cycle Day', stats.hasData ? `Day ${stats.cycleDay}` : '—', stats.cycleDay, stats.totalDays],
+            ['⏳', 'Next Period Countdown', stats.hasData ? (stats.isLate ? `+${stats.daysLate}d Late` : `${stats.daysUntilNext} days`) : '—', stats.hasData ? Math.max(0, stats.totalDays - stats.daysUntilNext) : 0, stats.totalDays],
+            ['🔄', 'Total Tracked Cycles', `${stats.totalCycles} cycles`, stats.totalCycles, Math.max(1, stats.totalCycles)],
+            ['⏱️', 'Average Cycle Length', `${stats.avgLength} days`, stats.avgLength, 40]
+        ].map(([i, t, v, n, d]) => `
+            <div class="card metric">
+                <div class="icon">${i}</div>
+                <p class="muted">${t}</p>
+                <h2>${v}</h2>
+                ${meter(n, d)}
+            </div>
+        `).join('')}
+
+        <!-- Phase-Specific Training & Nutrition Coaching -->
+        <div class="card full">
+            <h3>
+                <span>${stats.phaseIcon} ${stats.phase} Wellness Coaching</span>
+                <button class="pill secondary" data-action="cycleAI">✨ Ask Mistral AI About This Phase</button>
+            </h3>
+            <p class="muted">${stats.phaseDescription}</p>
+
+            <div class="cycle-guide-grid">
+                <div class="cycle-guide-col">
+                    <b>🏋️ Recommended Exercise & Energy Focus:</b>
+                    <p>${stats.phaseWorkoutTip}</p>
+                </div>
+                <div class="cycle-guide-col">
+                    <b>🥗 Phase-Specific Nutrition & Hydration:</b>
+                    <p>${stats.phaseNutritionTip}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Log New Cycle Form -->
+        ${box('Log Period / Cycle Entry', `
+            <p class="muted">Record when your period begins. Your cycle count and phase metrics will update automatically.</p>
+            <div class="row">
+                <label style="flex:1;min-width:180px;">
+                    Period start date
+                    <input type="date" id="cycleDate" value="${today}">
+                </label>
+                <label style="flex:1;min-width:130px;">
+                    Typical cycle length (days)
+                    <input type="number" id="cycleLength" value="${stats.latestCycle?.length || 28}" min="15" max="60">
+                </label>
+                <label style="flex:1;min-width:130px;">
+                    Bleeding duration (days)
+                    <input type="number" id="cycleDuration" value="${stats.latestCycle?.duration || 5}" min="1" max="15">
+                </label>
+                <label style="flex:1;min-width:140px;">
+                    Flow intensity
+                    <select id="cycleFlow">
+                        <option value="medium">Medium flow</option>
+                        <option value="heavy">Heavy flow</option>
+                        <option value="light">Light flow</option>
+                        <option value="spotting">Spotting</option>
+                    </select>
+                </label>
+            </div>
+
+            <label style="margin-top:14px;">Symptoms & sensations (check all that apply):</label>
+            <div class="symptoms-selector">
+                ${[
+                    ['cramps', '🩸 Cramps'],
+                    ['fatigue', '😴 Fatigue'],
+                    ['bloating', '🎈 Bloating'],
+                    ['headache', '🤕 Headache'],
+                    ['tender_breasts', '🌸 Tender Breasts'],
+                    ['mood_swings', '🎭 Mood Swings'],
+                    ['back_pain', '⚡ Back Pain'],
+                    ['high_energy', '⚡ High Energy'],
+                    ['acne', '✨ Acne'],
+                    ['cravings', '🍫 Cravings']
+                ].map(([val, label]) => `
+                    <label class="symptom-tag-label">
+                        <input type="checkbox" class="symptom-checkbox" value="${val}">
+                        ${label}
+                    </label>
+                `).join('')}
+            </div>
+
+            <label>Notes / Journal
+                <textarea id="cycleNotes" rows="2" placeholder="Energy levels, workout feelings, cravings, sleep notes..."></textarea>
+            </label>
+            <div style="margin-top:14px;">
+                ${button('Save Cycle Log', 'saveCycle')}
+            </div>
+        `, 'wide')}
+
+        <!-- Cycle History List -->
+        ${box(`Cycle History (${stats.totalCycles} Recorded)`, `
+            <div id="cycleHistoryList">
+                ${stats.sortedCycles.slice().reverse().map((x, idx) => {
+                    const cycleNum = stats.sortedCycles.length - idx;
+                    const nextEst = new Date(new Date(x.start + 'T12:00:00').getTime() + (Number(x.length) || 28) * 86400000).toLocaleDateString();
+                    const symptomList = Array.isArray(x.symptoms) ? x.symptoms : [];
+                    return `
+                        <div class="cycle-history-item">
+                            <div style="flex:1;">
+                                <div class="cycle-history-header">
+                                    <span class="cycle-num-badge">Cycle #${cycleNum}</span>
+                                    <b>Started: ${esc(x.start)}</b>
+                                    <span class="tag">${x.length || 28}d cycle · ${x.duration || 5}d period</span>
+                                    <span class="tag accent" style="text-transform:capitalize;">${esc(x.flow || 'Medium')} flow</span>
+                                </div>
+                                <p class="muted" style="margin:4px 0;">${esc(x.notes || 'No notes added.')}</p>
+                                ${symptomList.length ? `
+                                    <div class="cycle-symptom-pills">
+                                        ${symptomList.map(s => `<span class="cycle-symptom-pill">${esc(s.replace('_', ' '))}</span>`).join('')}
+                                    </div>
+                                ` : ''}
+                                <div style="font-size:12px;color:var(--text-muted);margin-top:6px;">
+                                    Next estimated: <b>${nextEst}</b>
+                                </div>
+                            </div>
+                            <button class="icon-btn" data-action="deleteCycle" data-id="${x.id || x.start}" title="Delete cycle record">🗑️</button>
+                        </div>
+                    `;
+                }).join('') || '<p class="muted">No cycle logs saved yet. Add your period start date above to start tracking your cycle counts!</p>'}
+            </div>
+        `, 'wide')}
+    </div>`;
+}
+
+// 9. Analytics Page
+function analyticsPage() {
+    const cycleStats = getCycleStats();
+
+    return `
+    <div class="grid">
+        ${box('Water Intake — Last 7 Days', '<canvas id="waterChart"></canvas>', 'wide')}
+        ${box('Activity Minutes — Last 7 Days', '<canvas id="activityChart"></canvas>', 'wide')}
+
+        ${db.profile.cycle !== false && cycleStats.totalCycles > 0 ? `
+            ${box('Menstrual Cycle Length Trends', '<canvas id="cycleChart"></canvas>', 'wide')}
+            ${box('Cycle Count & Rhythm Summary', `
+                <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:12px; margin-bottom:14px;">
+                    <div class="card metric" style="padding:14px;">
+                        <p class="muted">Current Day</p>
+                        <h2 style="font-size:20px;">Day ${cycleStats.cycleDay}</h2>
+                    </div>
+                    <div class="card metric" style="padding:14px;">
+                        <p class="muted">Active Phase</p>
+                        <h2 style="font-size:16px;">${cycleStats.phaseIcon} ${cycleStats.phase.split(' ')[0]}</h2>
+                    </div>
+                    <div class="card metric" style="padding:14px;">
+                        <p class="muted">Avg Cycle</p>
+                        <h2 style="font-size:20px;">${cycleStats.avgLength}d</h2>
+                    </div>
+                    <div class="card metric" style="padding:14px;">
+                        <p class="muted">Total Cycles</p>
+                        <h2 style="font-size:20px;">${cycleStats.totalCycles}</h2>
+                    </div>
+                </div>
+                <div class="row">
+                    ${button('🌸 Open Cycle Tracker', 'goCycle', 'class="secondary"')}
+                    ${button('✨ AI Cycle Insights', 'cycleAI')}
+                </div>
+            `, 'wide')}
+        ` : ''}
+
+        ${box('Overall Wellness Progress', `
+            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:14px; margin-bottom:18px;">
+                <div class="card metric" style="padding:16px;">
+                    <p class="muted">Total Workouts</p>
+                    <h2>${db.workouts.length}</h2>
+                </div>
+                <div class="card metric" style="padding:16px;">
+                    <p class="muted">Sleep Entries</p>
+                    <h2>${db.sleep.length}</h2>
+                </div>
+                <div class="card metric" style="padding:16px;">
+                    <p class="muted">Meals Tracked</p>
+                    <h2>${db.meals.length}</h2>
+                </div>
+                <div class="card metric" style="padding:16px;">
+                    <p class="muted">Today's Habits</p>
+                    <h2>${completed()} / ${db.habits.length}</h2>
+                </div>
+            </div>
+            <div class="row">
+                ${button('✨ Ask Mistral AI for a Weekly Summary', 'weeklyAI')}
+            </div>
+        `, 'full')}
+    </div>`;
+}
+
+// Chart.js renderer
+function renderCharts() {
+    if (typeof Chart === 'undefined') return;
+
+    // Destroy existing instances to prevent memory leak / canvas reuse errors
+    if (chartInstances.water) chartInstances.water.destroy();
+    if (chartInstances.activity) chartInstances.activity.destroy();
+    if (chartInstances.cycle) chartInstances.cycle.destroy();
+
+    const days = Array.from({ length: 7 }, (_, i) => {
+        let d = new Date();
+        d.setDate(d.getDate() - (6 - i));
+        return d.toLocaleDateString('en-CA');
+    });
+
+    const waterCanvas = $('#waterChart');
+    if (waterCanvas) {
+        chartInstances.water = new Chart(waterCanvas, {
+            type: 'bar',
+            data: {
+                labels: days.map(x => x.slice(5)),
+                datasets: [{
+                    label: 'Water Glasses',
+                    data: days.map(d => db.water[d] || 0),
+                    backgroundColor: '#1f7a55',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
     }
 
-    #nav {
-        flex-direction: row;
-        overflow-x: auto;
-        padding-bottom: 4px;
+    const activityCanvas = $('#activityChart');
+    if (activityCanvas) {
+        chartInstances.activity = new Chart(activityCanvas, {
+            type: 'bar',
+            data: {
+                labels: days.map(x => x.slice(5)),
+                datasets: [{
+                    label: 'Exercise Minutes',
+                    data: days.map(d => db.workouts.filter(w => w.date === d).reduce((a, w) => a + Number(w.minutes || 0), 0)),
+                    backgroundColor: '#3e9c74',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
     }
 
-    #nav button {
-        white-space: nowrap;
-        padding: 8px 12px;
-        font-size: 13.5px;
-        border-left: none;
-    }
+    const cycleCanvas = $('#cycleChart');
+    const cycleStats = getCycleStats();
+    if (cycleCanvas && cycleStats.totalCycles > 0) {
+        const cycleLabels = cycleStats.sortedCycles.map((c, idx) => `Cycle #${idx + 1} (${c.start.slice(5)})`);
+        const cycleLengths = cycleStats.sortedCycles.map(c => Number(c.length) || 28);
+        const cycleDurations = cycleStats.sortedCycles.map(c => Number(c.duration) || 5);
 
-    #nav button.active {
-        border-bottom: 3px solid var(--primary);
-        border-left: none;
-    }
-
-    .main {
-        padding: 20px 16px;
-    }
-
-    .grid {
-        grid-template-columns: 1fr;
-    }
-
-    .card.wide, .card.full {
-        grid-column: 1;
-    }
-
-    .hero {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 18px;
-    }
-
-    .chat-panel {
-        width: calc(100% - 24px);
-        right: 12px;
-        bottom: 80px;
-        height: 520px;
+        chartInstances.cycle = new Chart(cycleCanvas, {
+            type: 'bar',
+            data: {
+                labels: cycleLabels,
+                datasets: [
+                    {
+                        label: 'Cycle Length (days)',
+                        data: cycleLengths,
+                        backgroundColor: '#7c3aed',
+                        borderRadius: 6
+                    },
+                    {
+                        label: 'Period Duration (days)',
+                        data: cycleDurations,
+                        backgroundColor: '#f43f5e',
+                        borderRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true, suggestedMax: 35 } }
+            }
+        });
     }
 }
+
+// Main Render Function
+function render() {
+    nav();
+    $('#today').textContent = new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+    $('#pageTitle').textContent = page === 'Dashboard' ? 'Your wellness, simplified.' : page;
+
+    const views = {
+        Dashboard: dashboard,
+        Exercise: exercisePage,
+        Water: waterPage,
+        Sleep: sleepPage,
+        Nutrition: nutritionPage,
+        Mood: moodPage,
+        Habits: habitsPage,
+        'Cycle Tracker': cyclePage,
+        Analytics: analyticsPage
+    };
+
+    $('#content').innerHTML = (views[page] || dashboard)();
+
+    if (page === 'Exercise') {
+        loadExercises();
+    } else if (page === 'Analytics') {
+        renderCharts();
+    }
+}
+
+function go(targetPage) {
+    page = targetPage;
+    render();
+}
+
+// ----------------- Global Click & Event Handlers -----------------
+
+document.addEventListener('click', e => {
+    // Navigation
+    const navBtn = e.target.closest('[data-page]');
+    if (navBtn) {
+        return go(navBtn.dataset.page);
+    }
+
+    // Action buttons
+    const actionBtn = e.target.closest('[data-action]');
+    if (!actionBtn) return;
+
+    const action = actionBtn.dataset.action;
+
+    if (action === 'addWater') {
+        db.water[today] = Math.max(0, water() + 1);
+    } else if (action === 'removeWater') {
+        db.water[today] = Math.max(0, water() - 1);
+    } else if (action === 'saveWaterGoal') {
+        db.goals.water = Math.max(1, Number($('#waterGoal').value) || 8);
+    } else if (action === 'goSleep') {
+        return go('Sleep');
+    } else if (action === 'goExercise') {
+        return go('Exercise');
+    } else if (action === 'openAssistant') {
+        openChat();
+        return;
+    } else if (action === 'saveSleep') {
+        const bed = $('#bed').value.split(':').map(Number);
+        const wake = $('#wake').value.split(':').map(Number);
+        if (bed.length < 2 || wake.length < 2) return alert('Please enter both bed and wake times');
+        const mins = (wake[0] * 60 + wake[1] - bed[0] * 60 - bed[1] + 1440) % 1440;
+        db.sleep.push({
+            date: $('#sleepDate').value || today,
+            hours: +(mins / 60).toFixed(2)
+        });
+    } else if (action === 'viewManual') {
+        const id = actionBtn.dataset.id;
+        openExerciseManual(id);
+        return;
+    } else if (action === 'selectExercise') {
+        const name = actionBtn.dataset.name;
+        const input = $('#workoutExerciseInput');
+        if (input) {
+            input.value = name;
+            input.focus();
+            input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return;
+    } else if (action === 'saveWorkout') {
+        const name = ($('#workoutExerciseInput')?.value || '').trim();
+        if (!name) return alert('Please enter or select an exercise name');
+        db.workouts.push({
+            date: today,
+            name,
+            minutes: +$('#workoutMinutes').value || 30,
+            sets: +$('#workoutSets').value || 3,
+            reps: +$('#workoutReps').value || 10,
+            weight: +$('#workoutWeight').value || 0
+        });
+        if ($('#workoutExerciseInput')) $('#workoutExerciseInput').value = '';
+    } else if (action === 'saveMeal') {
+        const val = ($('#mealText').value || '').trim();
+        if (!val) return alert('Please enter what you ate or drank.');
+        db.meals.push({
+            date: today,
+            type: $('#mealType').value,
+            text: val
+        });
+        $('#mealText').value = '';
+    } else if (action === 'mood') {
+        db.moods[today] = +actionBtn.dataset.mood;
+    } else if (action === 'addHabit') {
+        const val = ($('#habitName').value || '').trim();
+        if (!val) return;
+        db.habits.push({ id: Date.now(), name: val, days: [] });
+        $('#habitName').value = '';
+    } else if (action === 'goCycle') {
+        return go('Cycle Tracker');
+    } else if (action === 'cycleAI') {
+        openChat();
+        const stats = getCycleStats();
+        if (stats.hasData) {
+            sendChatMessage(`I am on Day ${stats.cycleDay} of my menstrual cycle (${stats.phase}). Based on this phase, what workout intensity, exercises from the Exercise manual, and nutrition habits should I prioritize today?`);
+        } else {
+            sendChatMessage("Can you explain how tracking menstrual cycle counts and phases (Menstrual, Follicular, Ovulatory, Luteal) helps optimize fitness training and nutrition?");
+        }
+        return;
+    } else if (action === 'deleteCycle') {
+        const cycleId = actionBtn.dataset.id;
+        if (confirm('Delete this cycle log record?')) {
+            db.cycles = db.cycles.filter(c => String(c.id || c.start) !== String(cycleId));
+            save();
+            render();
+        }
+        return;
+    } else if (action === 'saveCycle') {
+        if (!$('#cycleDate').value) return alert('Please enter a period start date');
+        const selectedSymptoms = [...$$('.symptom-checkbox:checked')].map(cb => cb.value);
+        db.cycles.push({
+            id: Date.now(),
+            start: $('#cycleDate').value,
+            length: +$('#cycleLength').value || 28,
+            duration: +$('#cycleDuration').value || 5,
+            flow: $('#cycleFlow')?.value || 'medium',
+            symptoms: selectedSymptoms,
+            notes: ($('#cycleNotes')?.value || '').trim()
+        });
+    } else if (action === 'weeklyAI') {
+        openChat();
+        sendChatMessage("Please analyze my logged wellness data from this week (habits, water, workouts, sleep, and moods) and provide a supportive summary with 3 actionable improvements.");
+        return;
+    }
+
+    save();
+    render();
+});
+
+// Habit checkbox toggle
+document.addEventListener('change', e => {
+    if (e.target.matches('[data-habit]')) {
+        const habitId = +e.target.dataset.habit;
+        const habit = db.habits.find(h => h.id === habitId);
+        if (!habit) return;
+        habit.days = e.target.checked
+            ? [...new Set([...habit.days, today])]
+            : habit.days.filter(d => d !== today);
+        save();
+        render();
+    }
+});
+
+// Exercise filtering inputs
+document.addEventListener('input', e => {
+    if (e.target.id === 'exerciseSearch' || e.target.id === 'bodyPartFilter' || e.target.id === 'equipmentFilter') {
+        clearTimeout(exerciseSearchTimeout);
+        exerciseSearchTimeout = setTimeout(() => {
+            loadExercises();
+        }, 300);
+    }
+});
+
+// Manual Modal Actions
+const closeManualModal = () => {
+    const videoEl = $('#manualVideo');
+    if (videoEl) videoEl.pause();
+    $('#exerciseManualDialog').close();
+};
+$('#closeManualBtn').onclick = closeManualModal;
+$('#closeManualFooterBtn').onclick = closeManualModal;
+$('#logThisExerciseBtn').onclick = () => {
+    if (selectedExerciseForManual) {
+        closeManualModal();
+        go('Exercise');
+        setTimeout(() => {
+            const input = $('#workoutExerciseInput');
+            if (input) {
+                input.value = selectedExerciseForManual.name;
+                input.focus();
+                input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 100);
+    }
+};
+
+// Profile Dialog Actions
+$('#profileBtn').onclick = () => {
+    $('#nameInput').value = db.profile.name;
+    $('#genderInput').value = db.profile.gender;
+    $('#cycleEnabled').checked = db.profile.cycle;
+    $('#profileDialog').showModal();
+};
+
+$('#profileForm').addEventListener('submit', e => {
+    if (e.submitter?.value !== 'save') return;
+    db.profile = {
+        name: $('#nameInput').value.trim() || 'Friend',
+        gender: $('#genderInput').value,
+        cycle: $('#cycleEnabled').checked
+    };
+    save();
+    if (!db.profile.cycle && page === 'Cycle Tracker') {
+        page = 'Dashboard';
+    }
+    render();
+});
+
+// API Settings Dialog
+function openSettingsModal() {
+    $('#mistralKeyInput').value = localStorage.getItem('welllife_mistral_key') || '';
+    if ($('#workoutxKeyInput')) {
+        $('#workoutxKeyInput').value = localStorage.getItem('welllife_workoutx_key') || getWorkoutXApiKey();
+    }
+
+    fetchSafeJson('/api/status')
+        .then(status => {
+            const msg = $('#apiStatusMessage');
+            if (!msg) return;
+            if (status) {
+                msg.innerHTML = `
+                    <div style="background:#f4f8f5;padding:10px 14px;border-radius:8px;">
+                        <div>⚡ <b>WorkoutX API:</b> ${status.workoutxConfigured ? '✅ Active (2,760+ HD Video Exercises)' : '⚠️ Key not set'}</div>
+                        <div>🤖 <b>Mistral AI:</b> ${status.mistralConfigured ? '✅ Active' : '⚠️ Not set in server env'}</div>
+                    </div>
+                `;
+            } else {
+                msg.innerHTML = `
+                    <div style="background:#f0fdf4;padding:10px 14px;border-radius:8px;border:1px solid #bbf7d0;">
+                        <div>🌐 <b>Hosting Mode:</b> GitHub Pages / Static Web</div>
+                        <div>⚡ <b>WorkoutX API:</b> ✅ Client-Direct Active (2,760+ HD Videos)</div>
+                        <div>🤖 <b>Mistral AI:</b> ${localStorage.getItem('welllife_mistral_key') ? '✅ Key Active' : '⚠️ Enter key below to chat'}</div>
+                    </div>
+                `;
+            }
+        })
+        .catch(() => {});
+
+    $('#settingsDialog').showModal();
+}
+
+$('#settingsBtn').onclick = openSettingsModal;
+$('#chatSettingsBtn').onclick = openSettingsModal;
+$('#closeSettingsBtn').onclick = () => $('#settingsDialog').close();
+$('#closeSettingsFooterBtn').onclick = () => $('#settingsDialog').close();
+
+$('#saveApiSettingsBtn').onclick = () => {
+    const mistralKey = $('#mistralKeyInput').value.trim();
+    const workoutxKey = $('#workoutxKeyInput')?.value?.trim();
+
+    if (mistralKey) {
+        localStorage.setItem('welllife_mistral_key', mistralKey);
+    } else {
+        localStorage.removeItem('welllife_mistral_key');
+    }
+
+    if (workoutxKey) {
+        localStorage.setItem('welllife_workoutx_key', workoutxKey);
+    } else {
+        localStorage.removeItem('welllife_workoutx_key');
+    }
+
+    $('#settingsDialog').close();
+    if (page === 'Exercise') loadExercises();
+    bubble('API keys saved! WorkoutX Live Library and AI assistant are active.', 'bot');
+};
+
+// ----------------- Mistral AI Floating Assistant -----------------
+
+function openChat() {
+    $('#chatPanel').classList.remove('hidden');
+    $('#chatInput')?.focus();
+}
+
+function closeChat() {
+    $('#chatPanel').classList.add('hidden');
+}
+
+$('#chatToggle').onclick = () => {
+    if ($('#chatPanel').classList.contains('hidden')) {
+        openChat();
+    } else {
+        closeChat();
+    }
+};
+
+$('#closeChat').onclick = closeChat;
+
+$('#clearChatBtn').onclick = () => {
+    $('#messages').innerHTML = `
+        <div class="bubble bot">
+            Chat cleared! How can I assist you with your fitness, exercises, and wellness routines today?
+        </div>
+    `;
+};
+
+// Suggestion chips
+$$('.chat-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+        const prompt = chip.dataset.prompt;
+        if (prompt) {
+            openChat();
+            sendChatMessage(prompt);
+        }
+    });
+});
+
+// Format markdown text simply for chat display
+function formatMarkdown(text) {
+    if (!text) return '';
+    let html = esc(text);
+
+    // Bold **text**
+    html = html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+
+    // Italic *text*
+    html = html.replace(/\*(.*?)\*/g, '<i>$1</i>');
+
+    // Code `text`
+    html = html.replace(/`(.*?)`/g, '<code style="background:rgba(0,0,0,0.06);padding:2px 4px;border-radius:4px;">$1</code>');
+
+    // Line breaks
+    html = html.replace(/\n/g, '<br>');
+
+    return html;
+}
+
+function bubble(text, kind, isTyping = false) {
+    const el = document.createElement('div');
+    el.className = 'bubble ' + kind;
+    if (isTyping) {
+        el.className += ' typing';
+        el.innerHTML = '<span></span><span></span><span></span>';
+    } else {
+        el.innerHTML = formatMarkdown(text);
+    }
+    const messages = $('#messages');
+    messages.appendChild(el);
+    messages.scrollTop = messages.scrollHeight;
+    return el;
+}
+
+async function sendChatMessage(message) {
+    bubble(message, 'user');
+    const typingIndicator = bubble('', 'bot', true);
+
+    const cycleStats = getCycleStats();
+    const context = $('#aiConsent').checked ? {
+        profile: { name: db.profile.name, gender: db.profile.gender },
+        date: today,
+        water: { today: water(), goal: db.goals.water },
+        sleep: db.sleep.slice(-7),
+        workouts: db.workouts.slice(-10),
+        habits: db.habits.map(h => ({ name: h.name, completedToday: h.days.includes(today) })),
+        meals: db.meals.slice(-8),
+        moods: db.moods,
+        menstrualCycle: (db.profile.cycle !== false && cycleStats.hasData) ? {
+            currentCycleDay: cycleStats.cycleDay,
+            typicalCycleLength: cycleStats.totalDays,
+            currentPhase: cycleStats.phase,
+            daysUntilNextPeriod: cycleStats.daysUntilNext,
+            isLate: cycleStats.isLate,
+            daysLate: cycleStats.daysLate,
+            totalCyclesTracked: cycleStats.totalCycles,
+            averageCycleLength: cycleStats.avgLength,
+            averagePeriodDuration: cycleStats.avgDuration,
+            latestSymptoms: cycleStats.latestCycle?.symptoms || [],
+            latestNotes: cycleStats.latestCycle?.notes || ''
+        } : null,
+        cycles: db.profile.cycle !== false ? db.cycles.slice(-3) : []
+    } : {};
+
+    const clientMistralKey = localStorage.getItem('welllife_mistral_key') || undefined;
+    const isLocalHost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+
+    try {
+        let reply = null;
+
+        // Tier 1: Try local backend server if running locally
+        if (isLocalHost) {
+            try {
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message,
+                        context,
+                        apiKey: clientMistralKey
+                    })
+                });
+                const contentType = res.headers.get('content-type') || '';
+                if (res.ok && contentType.includes('application/json')) {
+                    const data = await res.json();
+                    reply = data.reply;
+                }
+            } catch (_) {}
+        }
+
+        // Tier 2: Direct browser call to Mistral AI API (works on GitHub Pages / static hosting via CORS)
+        if (!reply) {
+            const activeKey = clientMistralKey;
+            if (!activeKey) {
+                typingIndicator.remove();
+                bubble(`🌸 **Mistral AI on GitHub Pages:**\n\nTo chat with the AI assistant on static hosting, please click **⚙️ API Settings** at the top right and paste your free Mistral API key (from [console.mistral.ai](https://console.mistral.ai/)).`, 'bot');
+                return;
+            }
+
+            const systemPrompt = `You are WellLife AI, an empathetic, motivating, and knowledgeable wellness and fitness companion powered by Mistral AI.
+Your expertise covers:
+1. Exercise execution & form: explaining exercise mechanics, target muscles, proper posture, breathing, and safe progression.
+2. Daily wellness habits: hydration, sleep hygiene, nutrition awareness, active recovery, and streak building.
+3. Workout planning & recovery: personalized training recommendations.
+4. Tracker analysis: providing gentle, constructive insights from the user's logged tracker data.
+5. Menstrual cycle count & phase guidance: explaining how the menstrual cycle days and phases (Menstrual, Follicular, Ovulatory, Luteal) influence workout tolerance, muscle recovery, strength output, hydration, and nutritional needs.
+
+Health & Safety Guidelines:
+- Offer practical lifestyle, fitness, and wellness education.
+- Never diagnose medical illnesses or prescribe medications.
+- If the user describes sharp, sudden, or severe joint/muscle pain, advise consulting a physician or certified physical therapist.
+- Keep menstrual cycle references purely informative and never as contraceptive/fertility assurance.
+
+Formatting:
+- Use clean Markdown with bullet points, bold highlights, and friendly, concise paragraphs.
+- Be encouraging, realistic, and uplifting!`;
+
+            const messages = [
+                { role: "system", content: systemPrompt }
+            ];
+
+            if (context && Object.keys(context).length > 0) {
+                messages.push({
+                    role: "system",
+                    content: `User-shared wellness tracker context:\n${JSON.stringify(context, null, 2)}`
+                });
+            }
+
+            messages.push({
+                role: "user",
+                content: message.trim()
+            });
+
+            const mistralRes = await fetch("https://api.mistral.ai/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${activeKey}`
+                },
+                body: JSON.stringify({
+                    model: "mistral-small-latest",
+                    messages,
+                    temperature: 0.7,
+                    max_tokens: 1200
+                })
+            });
+
+            const contentType = mistralRes.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+                const mistralData = await mistralRes.json();
+                if (!mistralRes.ok) {
+                    throw new Error(mistralData.message || mistralData.error?.message || 'Mistral API request failed');
+                }
+                reply = mistralData.choices?.[0]?.message?.content?.trim();
+            } else {
+                throw new Error('Unexpected response format from Mistral AI');
+            }
+        }
+
+        typingIndicator.remove();
+        bubble(reply || "I'm here to help with your exercises, nutrition, and wellness habits!", 'bot');
+
+    } catch (err) {
+        typingIndicator.remove();
+        bubble(`⚠️ Could not reach Mistral AI: ${err.message}\n\nPlease click ⚙️ API Settings to enter or verify your key.`, 'bot');
+    }
+}
+
+$('#chatForm').onsubmit = async e => {
+    e.preventDefault();
+    const input = $('#chatInput');
+    const message = input.value.trim();
+    if (!message) return;
+    input.value = '';
+    await sendChatMessage(message);
+};
+
+// Initial startup render
+render();

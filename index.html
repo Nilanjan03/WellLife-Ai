@@ -12,6 +12,7 @@
     </script>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="exercises-data.js" defer></script>
     <script src="script.js" defer></script>
 </head>
 
@@ -39,7 +40,7 @@
                 <div class="topbar-right">
                     <span id="today"></span>
                     <button id="settingsBtn" class="pill secondary" title="API Settings">⚙️ API Settings</button>
-                    <button id="profileBtn" class="pill"> Profile</button>
+                    <button id="profileBtn" class="pill">👤 Profile</button>
                 </div>
             </header>
 
@@ -49,7 +50,7 @@
 
     <!-- Floating AI Assistant Toggle Button -->
     <button id="chatToggle" class="chat-toggle" aria-label="Open AI assistant">
-        <span class="sparkle"></span>
+        <span class="sparkle">✨</span>
         <span>Ask Mistral AI</span>
     </button>
 
@@ -57,7 +58,7 @@
     <section id="chatPanel" class="chat-panel hidden">
         <div class="chat-header">
             <div class="chat-header-info">
-                <h3> WellLife Assistant</h3>
+                <h3>✨ WellLife Assistant</h3>
                 <span class="badge-mistral">Powered by Mistral AI</span>
             </div>
             <div class="chat-header-actions">
@@ -70,15 +71,15 @@
         <!-- Quick AI Suggestions -->
         <div class="chat-suggestions">
             <button class="chat-chip" data-prompt="Based on my current menstrual cycle day and phase, what workout intensity and nutrition should I focus on today?">🌸 Cycle Advice</button>
-            <button class="chat-chip" data-prompt="Suggest an effective 3-day weekly workout routine."> 3-Day Workout</button>
-            <button class="chat-chip" data-prompt="Review my logged habits and water intake today, and give me advice."> Habit Review</button>
-            <button class="chat-chip" data-prompt="What are practical habits to get deeper, more restorative sleep?"> Sleep Deeply</button>
-            <button class="chat-chip" data-prompt="Give me a simple high-protein post-workout meal idea."> Meal Idea</button>
+            <button class="chat-chip" data-prompt="Suggest an effective 3-day weekly workout routine.">🏋️ 3-Day Workout</button>
+            <button class="chat-chip" data-prompt="Review my logged habits and water intake today, and give me advice.">📊 Habit Review</button>
+            <button class="chat-chip" data-prompt="What are practical habits to get deeper, more restorative sleep?">😴 Sleep Deeply</button>
+            <button class="chat-chip" data-prompt="Give me a simple high-protein post-workout meal idea.">🥗 Meal Idea</button>
         </div>
 
         <div id="messages" class="chat-messages">
             <div class="bubble bot">
-                 Hello! I'm your <b>WellLife AI assistant</b> powered by <b>Mistral AI</b>.<br><br>
+                👋 Hello! I'm your <b>WellLife AI assistant</b> powered by <b>Mistral AI</b>.<br><br>
                 I can explain exercise mechanics & form from the <b>Workout Manual</b>, suggest workout routines, analyze your daily habits, and guide your hydration and sleep.<br><br>
                 <i>How can I support your health and training today?</i>
             </div>
@@ -118,7 +119,7 @@
             <div id="manualInstructions"></div>
 
             <div class="manual-tip">
-                <b> Trainer Form Cue:</b> <span id="manualFormCue">Keep core braced, maintain steady rhythmic breathing, and never compromise technique for heavier weights.</span>
+                <b>💡 Trainer Form Cue:</b> <span id="manualFormCue">Keep core braced, maintain steady rhythmic breathing, and never compromise technique for heavier weights.</span>
             </div>
         </div>
         <div class="modal-footer">
@@ -174,7 +175,7 @@
             </p>
 
             <label style="margin-top:16px;">
-                 WorkoutX API Key (Active — 2,760+ Exercises with HD Video Demonstrations)
+                ⚡ WorkoutX API Key (Active — 2,760+ Exercises with HD Video Demonstrations)
                 <input id="workoutxKeyInput" type="password" value="wx_78fbd0580bddd8e01e5ef360e6173b4ec564861bf41ebc658ef13d04" placeholder="Enter WorkoutX API Key">
             </label>
             <p class="muted" style="font-size:12px;margin-top:2px;">
